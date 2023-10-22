@@ -1,3 +1,5 @@
+import warnings
+
 import numba as nb
 import numpy as np
 
@@ -99,18 +101,18 @@ def _get_ancestry(v):
 
         next_parent += 1
 
-    ancestry = np.flip(ancestry)
+    # ancestry = np.flip(ancestry)
 
     return ancestry
 
 
-def _build_newick(ancestry):
+def _build_newick_old(ancestry):
     """Build a tree from an "ancestry" array
 
     The input M should always be 3-dimensional with the following format:
-    1st column: parent node
-    2nd column: children 1
-    3rd column: children 2
+    1st column: child 1 parent node
+    2nd column: child 2
+    3rd column: parent node
 
     M is processed such that we iteratively write a Newick string
     to describe the tree.
@@ -125,14 +127,20 @@ def _build_newick(ancestry):
     str
         Newick string
     """
+    warnings.warn(
+        "This function is deprecated and will be removed soon.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     # List of parent nodes
     parent_nodes = []
 
     # List of sub-Newicks
     sub_newicks = []
 
-    for i in reversed(range(len(ancestry))):
-        parent, child1, child2 = ancestry[i, :]
+    for i in range(len(ancestry)):
+        child1, child2, parent = ancestry[i, :]
         # Case 1: Both children are parent nodes, so we have sub-newicks for them
         if child1 in parent_nodes and child2 in parent_nodes:
             # Find their indices
@@ -168,7 +176,7 @@ def _build_newick(ancestry):
         elif child2 in parent_nodes:
             idx = parent_nodes.index(child2)
             # Before: (sub_child2.1, sub_child2.2)child_2
-            # After: ((sub_child2.1, sub_child2.2)child_2, child_2)parent
+            # After: ((sub_child2.1, sub_child2.2)child_2, child_1)parent
             sub_newicks[idx] = "(" + sub_newicks[idx].replace(
                 f"{child2}", f"{child2},{child1}){parent}"
             )
@@ -185,10 +193,69 @@ def _build_newick(ancestry):
     # If everything went well, only 1 "sub-newick" should be left, with only 1 parent: the root node
     newick = sub_newicks[0] + ";"
 
-    # Convert to ete3 (for legacy reasons)
     return newick
 
 
+@nb.njit(cache=True)
+def _build_newick(ancestry):
+    """Build a tree from an "ancestry" array
+
+    The input M should always be 3-dimensional with the following format:
+    1st column: child 1 parent node
+    2nd column: child 2
+    3rd column: parent node
+
+    M is processed such that we iteratively write a Newick string
+    to describe the tree.
+
+    Parameters
+    ----------
+    M : numpy.ndarray
+        "Ancestry" array of size (n_leaves - 1, 3)
+
+    Returns
+    -------
+    str
+        Newick string
+    """
+    c1, c2, p = ancestry[-1, :]
+
+    newick = f"({c1},{c2}){p};"
+
+    node_idxs = {c1: 1, c2: 2 + len(f"{c1}")}
+
+    queue = []
+
+    n_leaves = ancestry.shape[0]
+
+    if c1 > n_leaves:
+        queue.append(c1)
+    if c2 > n_leaves:
+        queue.append(c2)
+
+    for _ in range(1, ancestry.shape[0]):
+        next_parent = queue.pop()
+
+        c1, c2, p = ancestry[next_parent - n_leaves - 1, :]
+
+        sub_newick = f"({c1},{c2}){p}"
+
+        newick = (
+            newick[: node_idxs[p]] + sub_newick + newick[node_idxs[p] + len(f"{p}") :]
+        )
+
+        node_idxs[c1] = node_idxs[p] + 1
+        node_idxs[c2] = node_idxs[c1] + 1 + len(f"{c1}")
+
+        if c1 > n_leaves:
+            queue.append(c1)
+        if c2 > n_leaves:
+            queue.append(c2)
+
+    return newick
+
+
+@nb.njit(cache=True)
 def to_newick(v):
     ancestry = _get_ancestry(v)
 
