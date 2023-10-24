@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 
 import numpy as np
 
-from phylo2vec.to_newick import to_newick
+from phylo2vec.base import to_newick
 from phylo2vec.utils import check_v
 
 

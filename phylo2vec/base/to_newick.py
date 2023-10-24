@@ -26,13 +26,16 @@ def _get_ancestry(v):
 
     Parameters
     ----------
-    v : list
-        Phylo2Vec
+    v : numpy.array
+        Phylo2Vec vector
 
     Returns
     -------
     ancestry : numpy.array
-        Ancestry
+        Ancestry matrix
+        1st column: child 1 parent node
+        2nd column: child 2
+        3rd column: parent node
     """
     # This is the first pair, we start with (0, 1)
     pairs = [(0, 1)]
@@ -104,24 +107,24 @@ def _get_ancestry(v):
 
 @nb.njit(cache=True)
 def _build_newick(ancestry):
-    """Build a tree from an "ancestry" array
+    """Build a Newick string from an "ancestry" array
 
-    The input M should always be 3-dimensional with the following format:
+    The input should always be 3-dimensional with the following format:
     1st column: child 1 parent node
     2nd column: child 2
     3rd column: parent node
 
-    M is processed such that we iteratively write a Newick string
+    The matrix is processed such that we iteratively write a Newick string
     to describe the tree.
 
     Parameters
     ----------
-    M : numpy.ndarray
+    ancestry : numpy.ndarray
         "Ancestry" array of size (n_leaves - 1, 3)
 
     Returns
     -------
-    str
+    newick : str
         Newick string
     """
     c1, c2, p = ancestry[-1, :]
@@ -163,6 +166,18 @@ def _build_newick(ancestry):
 
 @nb.njit(cache=True)
 def to_newick(v):
+    """Recover a rooted tree (in Newick format) from a Phylo2Vec v
+
+    Parameters
+    ----------
+    v : numpy.array
+        Phylo2Vec vector
+
+    Returns
+    -------
+    newick : str
+        Newick tree
+    """
     ancestry = _get_ancestry(v)
 
     newick = _build_newick(ancestry)
