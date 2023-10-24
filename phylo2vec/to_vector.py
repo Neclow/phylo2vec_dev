@@ -74,7 +74,7 @@ def _reduce_no_parents(newick):
     return np.array(ancestry)
 
 
-@nb.njit
+@nb.njit(cache=True)
 def _find_cherries(ancestry):
     ancestry_sorted = ancestry[np.argsort(ancestry[:, -1]), :]
 
@@ -93,7 +93,7 @@ def _find_cherries(ancestry):
     return ancestry_sorted
 
 
-@nb.njit
+@nb.njit(cache=True)
 def _order_cherries_no_parents(cherries):
     cherries_ = np.zeros((len(cherries), 4), dtype=np.int16) - 1
     cherries_[:, :-1] = cherries
@@ -136,7 +136,7 @@ def _order_cherries_no_parents(cherries):
     return cherries_[:, :-1]
 
 
-@nb.njit
+@nb.njit(cache=True)
 def _build_vector(cherries):
     v_res = np.zeros((cherries.shape[0],), dtype=np.int16)
     for i in range(cherries.shape[0] - 1, -1, -1):
