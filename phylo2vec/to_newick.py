@@ -13,12 +13,12 @@ def _get_ancestry(v):
 
 
     The initial situation looks like this:
-                     R
-                     |
-                     | --> branch 2
-                    / \
-      branch 0 <-- /   \  --> branch 1
-                  0     1
+                      R
+                      |
+                      | --> branch 2
+                    // \\
+      branch 0 <-- //   \\  --> branch 1
+                   0     1
 
     For v[1], we have 3 possible branches too choose from.
     v[1] = 0 or 1 indicates that we branch out from branch 0 or 1, respectively.
