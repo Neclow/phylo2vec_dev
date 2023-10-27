@@ -11,21 +11,21 @@ def parse_args():
     parser = ArgumentParser(prog="Phylo2Vec", description="Phylo2vec arguments")
 
     parser.add_argument(
-        "--toNewick",
+        "--to_newick",
         default=False,
         action="store_true",
         help="(bool) Convert to Newick format. Example input: 0,1,4",
     )
 
     parser.add_argument(
-        "--toVector",
+        "--to_vector",
         default=False,
         action="store_true",
         help='(bool) Convert to integer vector. Example input: "(((2,1)4,0)5,3)6;"',
     )
 
     parser.add_argument(
-        "--withMapping",
+        "--with_mapping",
         default=False,
         action="store_true",
         help="(bool) For Newicks that do not only contain digits, to use with toVector.\n"
@@ -58,14 +58,18 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
 
-    if args.toNewick:
+    if args.to_newick:
         v = np.fromiter(map(int, args.input.split(",")), dtype=np.int64)
 
         check_v(v)
 
         print(to_newick(v))
 
-    elif args.toVector:
-        pass
+    elif args.to_vector:
+        newick = args.input
+
+        if args.with_mapping:
+            pass  # TODO
+
     else:
         raise TypeError("Expected --toNewick or --toVector.")

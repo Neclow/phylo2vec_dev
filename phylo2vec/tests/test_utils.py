@@ -2,7 +2,11 @@ import pytest
 
 from phylo2vec.tests.config import MIN_N_LEAVES, MAX_N_LEAVES, N_REPEATS
 from phylo2vec.base.to_newick import to_newick
-from phylo2vec.utils import check_v, sample, find_num_leaves
+from phylo2vec.utils import (
+    check_v,
+    sample,
+    find_num_leaves,
+)
 
 
 @pytest.mark.parametrize("n_leaves", range(MIN_N_LEAVES, MAX_N_LEAVES + 1))

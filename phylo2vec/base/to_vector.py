@@ -1,12 +1,6 @@
 import numba as nb
 import numpy as np
 
-from phylo2vec.utils import find_num_leaves
-
-
-def integerize(newick):
-    pass
-
 
 def _reduce(newick):
     ancestry = []
