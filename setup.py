@@ -7,12 +7,12 @@ setup(
     author="Neil Scheidwasser",
     author_email="neil.clow@sund.ku.dk",
     url="https://github.com/Neclow/phylo2vec",
-    packages=find_packages,
+    packages=find_packages(),
+    python_requires="==3.10",
     install_requires=[
         "numba==0.56.4",
         "numpy==1.23.5",
         "biopython==1.80.0",
-        "python==3.10",
     ],
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
@@ -22,5 +22,6 @@ setup(
         "Programming Language :: Python :: 3.10",
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
         "Operating System :: Unix",
+        "Operating System :: Microsoft :: Windows",
     ],
 )

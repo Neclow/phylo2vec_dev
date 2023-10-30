@@ -13,6 +13,7 @@ Link to the preprint: https://arxiv.org/abs/2304.12693
 ## Additional test dependencies
 * ete3==3.1.3
 * pytest==7.4.2
+* six==1.16.0
 
 ### User installation:
 TODO
