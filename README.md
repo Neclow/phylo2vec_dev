@@ -5,9 +5,14 @@ Link to the preprint: https://arxiv.org/abs/2304.12693
 
 ## Installation
 ### Dependencies:
-* ete3==3.1.3
 * numba==0.56.4
 * numpy==1.23.5
+* biopython==1.80.0
+* python==3.10
+
+## Additional test dependencies
+* ete3==3.1.3
+* pytest==7.4.2
 
 ### User installation:
 TODO
