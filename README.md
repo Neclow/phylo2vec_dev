@@ -10,16 +10,20 @@ Link to the preprint: https://arxiv.org/abs/2304.12693
 * biopython==1.80.0
 * python==3.10
 
-## Additional test dependencies
-* ete3==3.1.3
-* pytest==7.4.2
-* six==1.16.0
-
 ### User installation:
-TODO
+* We recommend to setup an isolated enviroment, using conda, mamba or virtualenv.
+* Clone the repository and install using ```pip```:
+```
+git clone https://github.com/Neclow/phylo2vec_dev.git
+pip install -e .
+```
 
 ## Development
 ### Testing
+##### Additional test dependencies:
+* ete3==3.1.3
+* pytest==7.4.2
+* six==1.16.0
 After installation, you can launch the test suite from outside the source directory (you will need to have pytest >= 7.4.2 installed):
 ```
 pytest phylo2vec
