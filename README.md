@@ -19,11 +19,12 @@ pip install -e .
 ```
 
 ## Development
-### Testing
-##### Additional test dependencies:
+#### Additional test dependencies:
 * ete3==3.1.3
 * pytest==7.4.2
 * six==1.16.0
+
+### Testing:
 After installation, you can launch the test suite from outside the source directory (you will need to have pytest >= 7.4.2 installed):
 ```
 pytest phylo2vec
@@ -40,5 +41,4 @@ pytest phylo2vec
 ```
 * Preprint repository (core functions are deprecated): https://github.com/Neclow/phylo2vec_preprint
 * C++ version (deprecated): https://github.com/Neclow/phylo2vec_cpp
-* Related work: https://github.com/Neclow/GradME = phylo2vec + minimum evolution + gradient descent
-* The file ```100trees.txt``` is an anonmyised subset of [TimeTree](http://www.timetree.org/) trees adapted from: https://datadryad.org/stash/dataset/doi:10.5061/dryad.2fqz612vg. Kudos to [Mark Khurana](https://forskning.ku.dk/soeg/result/?pure=da%2Fpersons%2Fmark-poulsen-khurana(171ece7e-9567-4d48-8cf9-959b57de57c8).html) for the dataset
+* GradME: https://github.com/Neclow/GradME = phylo2vec + minimum evolution + gradient descent

@@ -7,7 +7,7 @@ from .newick import (
     remove_annotations,
     remove_parent_labels,
 )
-from .random import sample
+from .random import sample, seed_everything
 from .validation import check_v
 
 
@@ -18,4 +18,5 @@ __all__ = [
     "remove_annotations",
     "remove_parent_labels",
     "sample",
+    "seed_everything",
 ]
