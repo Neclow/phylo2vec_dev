@@ -13,6 +13,7 @@ setup(
         "numba==0.56.4",
         "numpy==1.23.5",
         "biopython==1.80.0",
+        "joblib==1.1.1",
     ],
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
