@@ -5,10 +5,11 @@ Link to the preprint: https://arxiv.org/abs/2304.12693
 
 ## Installation
 ### Dependencies:
+* python==3.10
 * numba==0.56.4
 * numpy==1.23.5
 * biopython==1.80.0
-* python==3.10
+* joblib==1.1.1
 
 ### User installation:
 * We recommend to setup an isolated enviroment, using conda, mamba or virtualenv.
