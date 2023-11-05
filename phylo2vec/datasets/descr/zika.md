@@ -2,7 +2,7 @@
 
 | Taxonomic Rank                     | Number of Taxa | Number of Bases | Type | Description  |
 |------------------------------------|----------------|-----------------|------|--------------|
-| Zika virus      | 86              | 10,807        | RNA  | Zika whole genomes isolated between 2013 and 2016. |
+| Zika virus      | 86              | 10,807        | RNA  | Zika whole genomes isolated between 2013 and 2016 (Retrieved from https://github.com/neherlab/treetime_examples). |
 
 References:
 ```latex

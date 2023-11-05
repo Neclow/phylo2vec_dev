@@ -2,7 +2,7 @@
 
 | Taxonomic Rank                     | Number of Taxa | Number of Bases | Type | Description  |
 |------------------------------------|----------------|-----------------|------|--------------|
-| Fungi; mainly *Saccharomyces*      | 8              | 127,018         | DNA  | Alignment of 106 orthologous genes of 8 different species of yeast. |
+| Fungi; mainly *Saccharomyces*      | 8              | 127,018         | DNA  | Alignment of 106 orthologous genes of 8 different species of yeast (Retrieved from https://github.com/KlausVigo/phangorn/). |
 
 
 References:
