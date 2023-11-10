@@ -1,3 +1,5 @@
-from ._base import load_descr, load_fasta
+"""Utilities to load/read/open datasets"""
 
-__all__ = ["load_descr", "load_fasta"]
+from ._base import load_descr, load_fasta, read_fasta
+
+__all__ = ["load_descr", "load_fasta", "read_fasta"]

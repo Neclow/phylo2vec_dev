@@ -1,8 +1,12 @@
+"""Newick string manipulation functions"""
 import re
 
 
+# Pattern of an integer label on the left of a pair
 LEFT_NODE_PATTERN = re.compile(r"\(\b\d+\b")
+# Pattern of an integer label on the right of a pair
 RIGHT_NODE_PATTERN = re.compile(r",\b\d+\b")
+# Pattern of a branch length annotation
 ANNOTATION_PATTERN = re.compile(r":\d+(\.\d+)?")
 
 
@@ -25,6 +29,18 @@ def find_num_leaves(newick):
 
 
 def create_label_mapping(newick):
+    """Create an integer-taxon label mapping (taxa_dict)
+
+    Parameters
+    ----------
+    newick : str
+        Newick representation of a tree
+
+    Returns
+    -------
+    label_mapping : str
+        Mapping of leaf labels (integer) to taxa
+    """
     label_mapping = {}
 
     newick = newick[:-1]  # For ";"
@@ -38,8 +54,11 @@ def create_label_mapping(newick):
             elif char == ")":
                 for child in newick[open_idx:i].split(",", 2):
                     if child not in label_mapping:
-                        label_mapping[f"{j}"] = child
+                        # Update the newick with an integer
                         newick_clean = newick_clean.replace(child, f"{j}")
+
+                        # Add the taxon to the mapping
+                        label_mapping[f"{j}"] = child
                         j += 1
 
                 parent = newick[i + 1 :].split(",", 1)[0].split(")", 1)[0]
@@ -73,10 +92,24 @@ def remove_annotations(newick):
 
 
 def remove_parent_labels(newick):
+    """Remove parent nodes from a Newick string
+
+    Example: "(((2,1)4,0)5,3)6;" --> "(((2,1),0),3);"
+
+    Parameters
+    ----------
+    newick : str
+        Newick representation of a tree
+
+    Returns
+    -------
+    newick_no_parent : str
+        Newick representation of a tree without parent labels
+    """
     open_idx = -1
     newick_no_parent = newick
     for i, char in enumerate(newick):
-        if (char == "," or char == ")" or char == ";") and open_idx != -1:
+        if (char in (",", ")", ";")) and open_idx != -1:
             newick_no_parent = newick_no_parent.replace(newick[open_idx:i], "")
             open_idx = -1
         if char == ")":

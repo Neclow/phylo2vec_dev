@@ -1,3 +1,4 @@
+"""Phylo2Vec vector manipulation functions."""
 import random
 
 import numba as nb
@@ -61,6 +62,29 @@ def reorder_v(reorder_method, v_old, taxa_dict_old):
 def _reorder_birth_death(
     ancestry_old, taxa_dict_old, reorder_internal=True, shuffle_cols=False
 ):
+    """Reorder v as a birth-death process (i.e., an "ordered" vector)
+
+    Parameters
+    ----------
+    ancestry_old : numpy.ndarray
+        Ancestry matrix
+        1st column: child 1 parent node
+        2nd column: child 2
+        3rd column: parent node
+    taxa_dict_old : dict[int, str]
+        Mapping of leaf labels (integer) to taxa
+    reorder_internal : bool, optional
+        If True, reorder internal labels, by default True
+    shuffle_cols : bool, optional
+        If True, shuffle children columns in the ancestry, by default False
+
+    Returns
+    -------
+    ancestry_new : numpy.ndarray
+        Reordered ancestry matrix
+    taxa_dict_new :
+        Reordered mapping of leaf labels (integer) to taxa
+    """
     # Copy old M
     ancestry_new = ancestry_old.copy()
 
@@ -128,7 +152,9 @@ def _reorder_birth_death(
         visits += 1
 
     # Re-sort M such that the root node R is the first row, then internal nodes R-1, R-2, ...
-    return ancestry_new[ancestry_new[:, 2].argsort()[::-1]], taxa_dict_new
+    ancestry_new = ancestry_new[ancestry_new[:, 2].argsort()[::-1]]
+
+    return ancestry_new, taxa_dict_new
 
 
 @nb.njit(cache=True)

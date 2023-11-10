@@ -1,4 +1,4 @@
-"""Random utility functions: sampling and seeding"""
+"""Random utility functions: sampling and seeding."""
 import os
 import random
 import numpy as np
@@ -16,6 +16,13 @@ def sample(n_leaves):
 
 
 def seed_everything(seed):
+    """Seed random, the Python hash seed, numpy
+
+    Parameters
+    ----------
+    seed : int
+        Random seed
+    """
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)

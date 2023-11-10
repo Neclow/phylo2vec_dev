@@ -1,3 +1,4 @@
+"""Test conversion from v to newick and back to v"""
 import numpy as np
 import pytest
 
@@ -21,6 +22,13 @@ N_REPEATS = 10
 
 @pytest.mark.parametrize("n_leaves", range(MIN_N_LEAVES, MAX_N_LEAVES + 1))
 def test_v2newick2v(n_leaves):
+    """Test that v to newick to converted_v leads to v == converted_v
+
+    Parameters
+    ----------
+    n_leaves : int
+        Number of leaves
+    """
     for _ in range(N_REPEATS):
         v = sample(n_leaves)
         newick = to_newick(v)
@@ -30,6 +38,13 @@ def test_v2newick2v(n_leaves):
 
 @pytest.mark.parametrize("n_leaves", range(MIN_N_LEAVES, MAX_N_LEAVES + 1))
 def test_cherries_no_parents(n_leaves):
+    """Test that the functions of to_vector_no_parents and to_vector do the same thing
+
+    Parameters
+    ----------
+    n_leaves : int
+        Number of leaves
+    """
     for _ in range(N_REPEATS):
         v = sample(n_leaves)
         newick = to_newick(v)

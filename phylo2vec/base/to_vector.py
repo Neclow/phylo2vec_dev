@@ -1,3 +1,10 @@
+"""
+Methods to convert a Newick to a Phylo2Vec vector.
+
+Two main methods:
+    - to_vector for a Newick with parent labels
+    - to_vector_no_parents for a Newick without parent labels
+"""
 import numba as nb
 import numpy as np
 
@@ -138,6 +145,18 @@ def _build_vector(cherries):
 
 
 def to_vector(newick):
+    """Convert a newick string with parent labels to a vector
+
+    Parameters
+    ----------
+    newick : str
+        Newick string for a tree
+
+    Returns
+    -------
+    v : numpy.ndarray
+        Phylo2Vec vector
+    """
     ancestry = _reduce(newick)
 
     cherries = _find_cherries(ancestry)
@@ -148,6 +167,18 @@ def to_vector(newick):
 
 
 def to_vector_no_parents(newick_no_parents):
+    """Convert a newick string without parent labels to a vector
+
+    Parameters
+    ----------
+    newick_no_parents : str
+        Newick string for a tree
+
+    Returns
+    -------
+    v : numpy.ndarray
+        Phylo2Vec vector
+    """
     ancestry = _reduce_no_parents(newick_no_parents)
 
     cherries = _order_cherries_no_parents(ancestry)

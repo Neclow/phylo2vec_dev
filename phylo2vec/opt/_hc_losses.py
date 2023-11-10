@@ -1,3 +1,4 @@
+"""Loss functions for hill-climbing optimisation."""
 import os
 import re
 import subprocess
@@ -17,12 +18,34 @@ IS_WINDOWS = sys.platform.startswith("win")
 def raxml_loss(
     v,
     taxa_dict,
-    raxml_path,
     fasta_path,
     tree_folder_path,
     substitution_model,
     outfile="tmp.tree",
+    **kwargs,
 ):
+    """Compute loss for a given v via RaXML-NG.
+
+    Parameters
+    ----------
+    v : numpy.ndarray or list
+        v representation of a tree
+    taxa_dict : dict[int, str]
+        Current mapping of leaf labels (integer) to taxa
+    fasta_path : str
+        Path to fasta file
+    tree_folder_path : str
+        Path to a folder which will contain all intermediary and best trees
+    substitution_model : str
+        DNA/AA substitution model
+    outfile : str, optional
+        Path to a temporary tree written in Newick format, by default 'tmp.tree'
+
+    Returns
+    -------
+    float
+        Negative log-likelihood computed using RaXML-NG
+    """
     try:
         newick = to_newick(v)
     except Exception as err:
@@ -37,19 +60,41 @@ def raxml_loss(
         nw_file.write(newick)
 
     return exec_raxml_ng(
-        raxml_path,
-        str(PurePosixPath(fasta_path.replace("C:", "/mnt/c"))),
-        str(PurePosixPath(tree_folder_path.replace("C:", "/mnt/c/"), outfile)),
-        substitution_model,
+        fasta_path=str(PurePosixPath(fasta_path.replace("C:", "/mnt/c"))),
+        tree_path=str(
+            PurePosixPath(tree_folder_path.replace("C:", "/mnt/c/"), outfile)
+        ),
+        substitution_model=substitution_model,
+        **kwargs,
     )
 
 
-def exec_raxml_ng(raxml_path, fasta_path, tree_path, substitution_model, no_files=True):
+def exec_raxml_ng(
+    fasta_path, tree_path, substitution_model, cmd="raxml-ng", no_files=True
+):
+    """Optimize branch lengths and free model parameters on a fixed topology
+    using RaxML-NG (https://github.com/amkozlov/raxml-ng)
+
+    Parameters
+    ----------
+    fasta_path : str
+        Path to FASTA file (MSA)
+    tree_path : str
+        Path to tree file (Newick representation of the tree)
+    substitution_model : str
+        DNA evolution model
+    cmd : str, optional
+        Location of the RAxML-nG executable, by default "raxml-ng"
+    no_files : bool, optional
+        If True, add the "nofiles" option to raxml
+
+    Returns
+    -------
+    float
+        Negative log-likelihood after optimization
+    """
     commands = [
-        "cd",
-        raxml_path,
-        "&&",
-        "./raxml-ng",
+        cmd,
         "--evaluate",
         "--msa",
         fasta_path,
