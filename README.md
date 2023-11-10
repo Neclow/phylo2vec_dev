@@ -35,9 +35,28 @@ pytest phylo2vec
 ### Conversions
   * The ```base``` module contains elements to convert a Newick string (```to_vector```) to a Phylo2Vec vector and vice versa (```to_newick```)
 
+Example:
+```python
+from phylo2vec.base import to_newick, to_vector
+
+v = [0, 1, 2, 3, 4]
+
+newick = to_newick(v) # '(0,(1,(2,(3,(4,5)6)7)8)9)10;'
+
+v_converted = to_vector(v) # array([0, 1, 2, 3, 4], dtype=int16)
+```
+
 ### Optimization
   * The ```opt``` module contains methods to perform phylogenetic inference using Phylo2Vec vectors
   * TODO: include GradME from https://github.com/Neclow/GradME
+
+Example:
+```python
+from phylo2vec.opt import HillClimbingOptimizer
+
+hc = HillClimbingOptimizer(raxml_cmd="/path/to/raxml-ng_v1.2.0_linux_x86_64/raxml-ng", verbose=True)
+v_opt, taxa_dict, losses = hc.fit("/path/to/your_fasta_file.fa")
+```
 
 ## Citation and other work
 ```latex
