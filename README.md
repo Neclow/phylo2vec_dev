@@ -31,6 +31,14 @@ After installation, you can launch the test suite from outside the source direct
 pytest phylo2vec
 ```
 
+## Basic usage
+### Conversions
+  * The ```base``` module contains elements to convert a Newick string (```to_vector```) to a Phylo2Vec vector and vice versa (```to_newick```)
+
+### Optimization
+  * The ```opt``` module contains methods to perform phylogenetic inference using Phylo2Vec vectors
+  * TODO: include GradME from https://github.com/Neclow/GradME
+
 ## Citation and other work
 ```latex
 @article{phylo2vec,
