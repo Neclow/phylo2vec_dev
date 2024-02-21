@@ -1,6 +1,7 @@
 """
 Various utilities to process Newick strings, check and sample Phylo2Vec vectors.
 """
+
 from .newick import (
     create_label_mapping,
     find_num_leaves,

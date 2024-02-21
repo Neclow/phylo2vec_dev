@@ -1,4 +1,5 @@
 """Phylo2Vec vector manipulation functions."""
+
 import random
 
 import numba as nb
@@ -140,9 +141,9 @@ def _reorder_birth_death(
                     # Then relabel 9 in M_old as 7 in M_new
                     internal_node = internal_labels.pop()
                     ancestry_new[row, i] = internal_node
-                    ancestry_new[
-                        2 * len(ancestry_new) - ancestry_old[row, i], 2
-                    ] = ancestry_new[row, i]
+                    ancestry_new[2 * len(ancestry_new) - ancestry_old[row, i], 2] = (
+                        ancestry_new[row, i]
+                    )
 
                 to_visit.append(child)
 

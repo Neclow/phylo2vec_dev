@@ -1,4 +1,5 @@
 """Tests for utility functions."""
+
 import pytest
 
 from phylo2vec.tests.config import MIN_N_LEAVES, MAX_N_LEAVES, N_REPEATS

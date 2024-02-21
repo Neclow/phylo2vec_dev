@@ -5,6 +5,7 @@ Two main methods:
     - to_vector for a Newick with parent labels
     - to_vector_no_parents for a Newick without parent labels
 """
+
 import numba as nb
 import numpy as np
 
@@ -145,7 +146,7 @@ def _build_vector(cherries):
 
 
 def to_vector(newick):
-    """Convert a newick string with parent labels to a vector
+    """Convert a Newick string with parent labels to a vector
 
     Parameters
     ----------
@@ -167,7 +168,7 @@ def to_vector(newick):
 
 
 def to_vector_no_parents(newick_no_parents):
-    """Convert a newick string without parent labels to a vector
+    """Convert a Newick string without parent labels to a vector
 
     Parameters
     ----------
