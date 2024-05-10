@@ -15,17 +15,6 @@ from benchmarks.plot import clear_axes, set_size
 from phylo2vec.base import to_newick
 from phylo2vec.utils import sample
 
-plt.rcParams.update(
-    {
-        "font.serif": ["sffamily"],
-        "figure.dpi": "100",
-        "font.size": 9,
-        "text.usetex": True,
-    }
-)
-
-matplotlib.rc("text.latex", preamble=r"\usepackage{amsmath}")
-
 MIN_LEAVES = 5
 MAX_LEAVES = 10000
 STEP_LEAVES = 50
@@ -47,13 +36,18 @@ def parse_args():
         help="Show plot output with matplotlib.",
     )
     parser.add_argument(
+        "--no-latex",
+        action="store_false",
+        help="Do not use LaTeX fonts for math in matplotlib",
+    )
+    parser.add_argument(
         "--output-file", type=str, default="bench_size", help="Output file name"
     )
 
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def main():
     args = parse_args()
 
     output_csv = f"benchmarks/res/{args.output_file}.csv"
@@ -66,7 +60,7 @@ if __name__ == "__main__":
     palette = dict(zip(tests, [*sns.color_palette("OrRd_r", n_colors=3).as_hex(), "k"]))
 
     for i, n_leaves in tqdm(enumerate(all_leaves), total=len(all_leaves)):
-        v = sample(n_leaves).astype(np.int16)
+        v = sample(n_leaves)
         newick = to_newick(v)
 
         sizes["Phylo2Vec (int16)"][i] = sys.getsizeof(v)
@@ -86,7 +80,19 @@ if __name__ == "__main__":
     sizes_df.to_csv(output_csv, index=False)
     print(f"Data saved at {output_csv}")
 
-    fig, ax = plt.subplots(1, 1, figsize=set_size(290, "h"))
+    if not args.no_latex:
+        plt.rcParams.update(
+            {
+                "font.serif": ["sffamily"],
+                "figure.dpi": "100",
+                "font.size": 9,
+                "text.usetex": True,
+            }
+        )
+
+        matplotlib.rc("text.latex", preamble=r"\usepackage{amsmath}")
+
+    _, ax = plt.subplots(1, 1, figsize=set_size(290, "h"))
 
     sns.scatterplot(
         x="n_leaves",
@@ -110,3 +116,7 @@ if __name__ == "__main__":
 
     if args.show_plot:
         plt.show()
+
+
+if __name__ == "__main__":
+    main()
