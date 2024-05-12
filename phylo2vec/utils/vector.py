@@ -172,7 +172,7 @@ def _reorder_bfs(ancestry_old, taxa_dict_old):
 
     # Taxa dict to be updated
     taxa_dict_new = nb.typed.Dict.empty(
-        key_type=nb.types.int16, value_type=nb.types.unicode_type
+        key_type=nb.types.int64, value_type=nb.types.unicode_type
     )
 
     while len(to_visit) > 0:
