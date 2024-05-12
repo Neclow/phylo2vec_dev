@@ -9,7 +9,7 @@ import numpy as np
 @nb.njit(cache=True)
 def _get_ancestry(v):
     """
-    Get the ancestry of v (see "Returns" paragraph)
+    Get the "ancestry" of v (see "Returns" paragraph)
 
     v[i] = which BRANCH we do the pairing from
 

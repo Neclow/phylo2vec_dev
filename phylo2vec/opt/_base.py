@@ -29,7 +29,7 @@ class BaseOptimizer:
     @staticmethod
     def _make_taxa_dict(records):
         taxa_dict = nb.typed.Dict.empty(
-            key_type=nb.types.int16, value_type=nb.types.unicode_type
+            key_type=nb.types.int64, value_type=nb.types.unicode_type
         )
 
         for i, r in enumerate(records):

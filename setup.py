@@ -11,7 +11,7 @@ with open("README.md", encoding="utf-8") as f:
 
 setup(
     name="phylo2vec",
-    version="0.1.1",
+    version="0.1.3",
     description="Phylo2Vec: integer vector representation of binary (phylogenetic) trees",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",  # This is important!
@@ -19,7 +19,7 @@ setup(
     author_email="neil.clow@sund.ku.dk",
     url="https://github.com/Neclow/phylo2vec",
     packages=find_packages(),
-    python_requires="==3.10",
+    python_requires=">=3.9",
     install_requires=[
         "numba==0.56.4",
         "numpy==1.23.5",
