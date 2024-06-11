@@ -138,17 +138,18 @@ def _build_newick(ancestry):
 
     queue = []
 
-    n_leaves = ancestry.shape[0]
+    # Max number for a leaf
+    n_max = ancestry.shape[0]
 
-    if c1 > n_leaves:
+    if c1 > n_max:
         queue.append(c1)
-    if c2 > n_leaves:
+    if c2 > n_max:
         queue.append(c2)
 
     for _ in range(1, ancestry.shape[0]):
         next_parent = queue.pop()
 
-        c1, c2, p = ancestry[next_parent - n_leaves - 1, :]
+        c1, c2, p = ancestry[next_parent - n_max - 1, :]
 
         sub_newick = f"({c1},{c2}){p}"
 
@@ -159,9 +160,9 @@ def _build_newick(ancestry):
         node_idxs[c1] = node_idxs[p] + 1
         node_idxs[c2] = node_idxs[c1] + 1 + len(f"{c1}")
 
-        if c1 > n_leaves:
+        if c1 > n_max:
             queue.append(c1)
-        if c2 > n_leaves:
+        if c2 > n_max:
             queue.append(c2)
 
     return newick

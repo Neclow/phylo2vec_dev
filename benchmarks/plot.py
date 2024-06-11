@@ -1,3 +1,10 @@
+"""
+Plotting utility functions for the benchmarks
+"""
+
+# pylint: disable=protected-access
+
+import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -83,3 +90,44 @@ def set_size(width, layout="h", fraction=1):
     fig_dim = (fig_width_in, fig_height_in)
 
     return fig_dim
+
+
+def plot_sizes(tests, sizes_df, output_pdf, no_latex, show_plot):
+    if not no_latex:
+        plt.rcParams.update(
+            {
+                "font.serif": ["sffamily"],
+                "figure.dpi": "100",
+                "font.size": 9,
+                "text.usetex": True,
+            }
+        )
+
+        matplotlib.rc("text.latex", preamble=r"\usepackage{amsmath}")
+
+    _, ax = plt.subplots(1, 1, figsize=set_size(290, "h"))
+
+    palette = dict(zip(tests, [*sns.color_palette("OrRd_r", n_colors=3).as_hex(), "k"]))
+
+    sns.scatterplot(
+        x="n_leaves",
+        y="Size [kB]",
+        hue="format",
+        data=sizes_df,
+        s=4,
+        palette=palette,
+        ax=ax,
+    )
+
+    ax.legend(title="")
+    ax.xaxis.get_major_formatter()._usetex = False
+    ax.yaxis.get_major_formatter()._usetex = False
+
+    clear_axes()
+
+    plt.savefig(output_pdf, bbox_inches="tight", pad_inches=0)
+
+    print(f"Plot saved at {output_pdf}")
+
+    if show_plot:
+        plt.show()

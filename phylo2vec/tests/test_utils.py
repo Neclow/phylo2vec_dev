@@ -49,8 +49,8 @@ def test_find_num_leaves(n_leaves):
 def test_remove_and_add(n_leaves):
     """Test removing and adding a node to a vector
 
-    Sample a v, remove a random leaf
-    Should recover the same v after adding it back
+    Sample a v, remove a random leaf and add it back
+    Test if we recover the same v
 
     Parameters
     ----------

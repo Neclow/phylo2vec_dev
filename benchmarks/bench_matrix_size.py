@@ -1,5 +1,5 @@
 """
-Comparison of storage size of Phylo2Vec vectors vs. Newick strings
+Comparison of storage size of Phylo2Mat vs. Newick strings
 """
 
 import sys
@@ -12,7 +12,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from benchmarks.plot import plot_sizes
-from phylo2vec.base import to_newick
+from phylo2vec.matrix import to_newick
 from phylo2vec.utils import sample
 
 MIN_LEAVES = 5
@@ -20,9 +20,11 @@ MAX_LEAVES = 10000
 STEP_LEAVES = 50
 
 tests = [
-    "Phylo2Vec (int16)",
-    "Phylo2Vec (int32)",
-    "Phylo2Vec (string)",
+    "Phylo2Mat (structured)",
+    "Phylo2Mat (float16)",
+    "Phylo2Mat (object)",
+    "Phylo2Mat (string)",
+    "Newick (string with BLs rounded to 6 digits)",
     "Newick (string)",
 ]
 
@@ -52,28 +54,44 @@ def parse_args():
 
 
 def compute_sizes(all_leaves, output_csv):
-    # Pre-allocate size arrays for each test
     sizes = {test: np.zeros((len(all_leaves),), dtype=np.int32) for test in tests}
 
-    # Compute sizes
-    for i, n_leaves in tqdm(enumerate(all_leaves), total=len(all_leaves)):
-        v = sample(n_leaves)
-        newick = to_newick(v)
+    for i, n_max in tqdm(enumerate(all_leaves), total=len(all_leaves)):
+        v = sample(n_max)
+        bls = np.random.uniform(low=0, high=1, size=(n_max - 1, 2)).astype(np.float32)
 
-        sizes["Phylo2Vec (int16)"][i] = sys.getsizeof(v)
-        sizes["Phylo2Vec (int32)"][i] = sys.getsizeof(v.astype(np.int32))
-        sizes["Phylo2Vec (string)"][i] = sys.getsizeof(",".join(map(str, v)))
+        m = np.concatenate([v[:, None], bls.astype(np.float16)], axis=1)
+
+        m_obj = np.concatenate(
+            [v[:, None], bls.astype(np.float16)], axis=1, dtype=object
+        )
+
+        m_str = pd.DataFrame(m_obj).to_csv(index=False)
+
+        m_structured = np.array(
+            [(v[i], bls[i, 0], bls[i, 1]) for i in range(n_max - 1)],
+            dtype=[("v", np.int16), ("bl1", np.float16), ("bl2", np.float16)],
+        )
+
+        newick_six = to_newick(v, bls.round(6).astype(str))
+
+        newick = to_newick(v, bls.astype(str))
+
+        sizes["Phylo2Mat (float16)"][i] = sys.getsizeof(m)
+        sizes["Phylo2Mat (object)"][i] = sys.getsizeof(m_obj)
+        sizes["Phylo2Mat (structured)"][i] = sys.getsizeof(m_structured)
+        sizes["Phylo2Mat (string)"][i] = sys.getsizeof(m_str)
+        sizes["Newick (string with BLs rounded to 6 digits)"][i] = sys.getsizeof(
+            newick_six
+        )
         sizes["Newick (string)"][i] = sys.getsizeof(newick)
 
-    # Make a DataFrame and convert to long format
     sizes_df = pd.DataFrame(sizes)
     sizes_df["n_leaves"] = all_leaves
-
     sizes_df = sizes_df.melt(
-        id_vars="n_leaves", var_name="format", value_name="Size [B]"
+        id_vars="n_leaves", var_name="format", value_name="size [B]"
     )
-
-    sizes_df["Size [kB]"] = sizes_df["Size [B]"].div(1000)
+    sizes_df["size [kB]"] = sizes_df["size [B]"].div(1000)
 
     sizes_df.to_csv(output_csv, index=False)
 

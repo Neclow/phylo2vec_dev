@@ -35,18 +35,20 @@ def create_label_mapping(newick):
     Parameters
     ----------
     newick : str
-        Newick representation of a tree
+        Newick with string labels
 
     Returns
     -------
-    label_mapping : str
+    label_mapping : Dict int --> str
         Mapping of leaf labels (integer) to taxa
+    newick_clean : str
+        Newick with integer labels
     """
     label_mapping = {}
 
     newick = newick[:-1]  # For ";"
 
-    newick_clean = newick[:-1]  # For ";"
+    newick_clean = newick
 
     def do_reduce(newick, newick_clean, j):
         for i, char in enumerate(newick):
