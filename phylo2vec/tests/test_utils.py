@@ -46,11 +46,19 @@ def test_find_num_leaves(n_leaves):
     for _ in range(N_REPEATS):
         v = sample(n_leaves)
         newick = to_newick(v)
+        # Assert that find_num_leaves returns the true number of leaves in the the tree
         assert find_num_leaves(newick) == n_leaves
 
 
 @pytest.mark.parametrize("n_leaves", range(MIN_N_LEAVES, MAX_N_LEAVES + 1))
 def test_create_and_apply_label_mapping(n_leaves):
+    """Test create_label_mapping and apply_label_mapping
+
+    Parameters
+    ----------
+    n_leaves : int
+        Number of leaves
+    """
     for _ in range(N_REPEATS):
         # Random string Newick
         t = Tree()
