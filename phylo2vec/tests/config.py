@@ -3,7 +3,7 @@
 from typing import Final
 
 # Minimum number of leaves
-MIN_N_LEAVES: Final = 5
+MIN_N_LEAVES: Final = 10
 
 # Maximum number of leaves
 MAX_N_LEAVES: Final = 200

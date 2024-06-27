@@ -53,11 +53,11 @@ def _get_ancestry(v):
             # (as the branch leading to v[i] gives birth to the next_leaf)
             # Why pairs.insert(0)? Let's take an example with [0, 0]
             # We initially have (0, 1), but 0 gives birth to 2 afterwards
-            # So the "deepest" pair is (0, 2)
+            # So the "shallowest" pair is (0, 2)
             pairs.insert(0, (v[i], next_leaf))
         else:
             # If v[i] > i, it's not the branch leading v[i] that gives birth but an internal branch
-            # Remark 1: it will not be the "deepest" pair, so we do not insert it at position 0
+            # Remark 1: it will not be the "shallowest" pair, so we do not insert it at position 0
             # len(pairs) = number of pairings we did so far
             # So what v[i] - len(pairs) gives us is the depth of the next pairing
             # And pairs[v[i] - len(pairs) - 1][0] is a node that we processed beforehand
