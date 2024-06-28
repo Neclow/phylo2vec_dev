@@ -36,7 +36,7 @@ def _get_ancestry(v):
     -------
     ancestry : numpy.array
         Ancestry matrix
-        1st column: child 1 parent node
+        1st column: child 1
         2nd column: child 2
         3rd column: parent node
     """
@@ -113,7 +113,7 @@ def _build_newick(ancestry):
     """Build a Newick string from an "ancestry" array
 
     The input should always be 3-dimensional with the following format:
-    1st column: child 1 parent node
+    1st column: child 1
     2nd column: child 2
     3rd column: parent node
 
