@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "core.hpp"
+
 /**
  * @brief Get ancestry for each node given a v-representation.
  *
@@ -15,7 +17,7 @@
  * 2nd column: child 2
  * 3rd column: parent node
  */
-std::vector<std::array<int, 3>> getAncestry(const std::vector<int> &v);
+std::vector<std::array<int, 3>> getAncestry(const PhyloVec &v);
 
 /**
  * @brief
@@ -32,6 +34,6 @@ std::string buildNewick(const std::vector<std::array<int, 3>> &ancestry);
  *
  * @param v Phylo2Vec vector
  */
-std::string toNewick(const std::vector<int> &v);
+std::string toNewick(const PhyloVec &v);
 
 #endif // TO_NEWICK_HPP
