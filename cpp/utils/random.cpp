@@ -1,9 +1,9 @@
 #include "random.hpp"
 #include <random>
 
-std::vector<uint16_t> sample(const int &n_leaves, bool ordered)
+PhyloVec sample(const int &n_leaves, bool ordered)
 {
-    std::vector<uint16_t> v;
+    PhyloVec v;
     std::random_device rd;
     std::mt19937 gen(rd());
 

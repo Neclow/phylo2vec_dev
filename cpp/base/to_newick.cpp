@@ -1,11 +1,12 @@
 #include "to_newick.hpp"
 
+#include <iostream>
 #include <unordered_map>
 
-std::vector<std::array<int, 3>> getAncestry(const PhyloVec &v)
+Ancestry getAncestry(const PhyloVec &v)
 {
     // Matrix with 3 columns: child1, child2, parent
-    std::vector<std::array<int, 3>> ancestry;
+    Ancestry ancestry(v.size());
 
     // This is the first pair, we start with (0, 1)
     std::vector<std::pair<int, int>> pairs;
@@ -92,7 +93,7 @@ std::vector<std::array<int, 3>> getAncestry(const PhyloVec &v)
     return ancestry;
 }
 
-std::string buildNewick(const std::vector<std::array<int, 3>> &ancestry)
+std::string buildNewick(const Ancestry &ancestry)
 {
     // Row with 2 children of root + root node
     std::array<int, 3> row = ancestry.back();
@@ -116,7 +117,7 @@ std::string buildNewick(const std::vector<std::array<int, 3>> &ancestry)
     {
         queue.push_back(c1);
     }
-    if (c1 > n_max)
+    if (c2 > n_max)
     {
         queue.push_back(c2);
     }
@@ -139,12 +140,12 @@ std::string buildNewick(const std::vector<std::array<int, 3>> &ancestry)
         c1_str = std::to_string(c1);
         p_str = std::to_string(p);
 
-        sub_newick = "(" + c1_str + "," + std::to_string(c2) + ")" + p_str + ";";
+        sub_newick = "(" + c1_str + "," + std::to_string(c2) + ")" + p_str;
 
-        newick = newick.substr(0, node_idxs[p]) + sub_newick + newick.substr(node_idxs[p] + p_str.size());
+        newick = newick.substr(0, node_idxs[p]) + sub_newick + newick.substr(node_idxs[p] + p_str.length());
 
         node_idxs[c1] = node_idxs[p] + 1;
-        node_idxs[c2] = node_idxs[c1] + 1 + c1_str.size();
+        node_idxs[c2] = node_idxs[c1] + 1 + c1_str.length();
 
         if (c1 > n_max)
         {

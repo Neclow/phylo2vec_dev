@@ -17,7 +17,7 @@
  * 2nd column: child 2
  * 3rd column: parent node
  */
-std::vector<std::array<int, 3>> getAncestry(const PhyloVec &v);
+Ancestry getAncestry(const PhyloVec &v);
 
 /**
  * @brief
@@ -27,7 +27,7 @@ std::vector<std::array<int, 3>> getAncestry(const PhyloVec &v);
  * @param ancestry "Ancestry" array of size (n_leaves - 1, 3)
  * @return std::string Newick string
  */
-std::string buildNewick(const std::vector<std::array<int, 3>> &ancestry);
+std::string buildNewick(const Ancestry &ancestry);
 
 /**
  * @brief Wrapper of getAncestry and buildNewick

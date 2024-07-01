@@ -1,7 +1,7 @@
 #ifndef VALIDATION_HPP
 #define VALIDATION_HPP
 
-#include "base/core.hpp"
+#include "../base/core.hpp"
 
 /**
  * @brief check that Phylo2Vec v is correct
