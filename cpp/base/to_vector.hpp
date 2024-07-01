@@ -19,7 +19,7 @@ Ancestry orderCherriesNoParents(Ancestry cherries);
 
 PhyloVec buildVector(const Ancestry &cherries);
 
-PhyloVec toVector(std::string newick);
+PhyloVec toVector(std::string &newick);
 
 PhyloVec toVectorNoParents(std::string newick_no_parents);
 

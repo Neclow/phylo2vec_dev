@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(phylo2vec)
 
-# GoogleTest requires at least C++17
+# GoogleTest requires at least C++14
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -28,6 +28,13 @@ FetchContent_MakeAvailable(googletest)
 # # Set compiler flags for OpenMP
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+# Find benchmark package
+find_package(benchmark REQUIRED)
+
 # Source files
 set(SOURCES
     base/to_newick.cpp
@@ -42,9 +49,14 @@ set(TEST_SOURCES
     tests/test_v2newick2v.cpp
 )
 
-# Main executable
-# add_executable(phylo2vec ${SOURCES})
+# Benchmark
+set(BENCH_SOURCES
+    ${SOURCES}
+    benchmarks/bench_base.cpp
+)
 
+# Main executable
+add_executable(phylo2vec main.cpp ${SOURCES})
 # Include directories
 # target_include_directories(phylo2vec PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/base)
 
@@ -57,8 +69,12 @@ add_executable(phylo2vec_test ${TEST_SOURCES})
 # Link against Google Test and Google Mock
 target_link_libraries(phylo2vec_test PRIVATE gtest_main)
 
+# Add tests
+add_test(NAME phylo2vec_test COMMAND phylo2vec_test)
+
 # Optionally, add a test target (for running tests using CTest)
 # include(CTest)
 
-# Add tests
-add_test(NAME phylo2vec_test COMMAND phylo2vec_test)
+# Benchmarking
+add_executable(bench ${BENCH_SOURCES})
+target_link_libraries(bench PUBLIC benchmark::benchmark)

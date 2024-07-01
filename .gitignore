@@ -211,3 +211,6 @@ trees/
 *.exe
 *.out
 *.app
+
+# Other
+build2/

@@ -1,6 +1,5 @@
 #include "to_newick.hpp"
 
-#include <iostream>
 #include <unordered_map>
 
 Ancestry getAncestry(const PhyloVec &v)
@@ -9,11 +8,12 @@ Ancestry getAncestry(const PhyloVec &v)
     Ancestry ancestry(v.size());
 
     // This is the first pair, we start with (0, 1)
-    std::vector<std::pair<int, int>> pairs;
+    // std::vector<std::pair<int, int>> pairs; seems to be slower
+    std::vector<std::array<unsigned int, 2>> pairs;
 
-    pairs.push_back(std::make_pair(0, 1));
+    pairs.push_back({0, 1});
 
-    int next_leaf;
+    unsigned int next_leaf;
 
     // The goal here is to add mergers like in the previous iteration
     for (std::size_t i = 1; i < v.size(); ++i)
@@ -30,7 +30,7 @@ Ancestry getAncestry(const PhyloVec &v)
             We initially have (0, 1), but 0 gives birth to 2 afterwards
             So the "shallowest" pair is (0, 2)
             */
-            pairs.insert(pairs.begin(), std::make_pair(v[i], next_leaf));
+            pairs.insert(pairs.begin(), {v[i], next_leaf});
         }
         else
         {
@@ -44,7 +44,7 @@ Ancestry getAncestry(const PhyloVec &v)
             */
             pairs.insert(
                 pairs.begin() + v[i] - pairs.size(),
-                std::make_pair(pairs[v[i] - pairs.size() - 1].first, next_leaf));
+                {pairs[v[i] - pairs.size() - 1][0], next_leaf});
         }
     }
 
@@ -57,14 +57,13 @@ Ancestry getAncestry(const PhyloVec &v)
     // Leaves are number 0, 1, ..., n_leaves - 1, so the next parent is n_leaves
     int next_parent = v.size() + 1;
 
-    int child1, child2;
+    // int child1, child2;
     int parent_child1, parent_child2;
     int sibling_child1, sibling_child2;
 
     for (std::size_t i = 0; i < pairs.size(); ++i)
     {
-        child1 = pairs[i].first;
-        child2 = pairs[i].second;
+        auto &[child1, child2] = pairs[i];
 
         parent_child1 = parents.find(child1) != parents.end() ? parents[child1] : child1;
         parent_child2 = parents.find(child2) != parents.end() ? parents[child2] : child2;
@@ -96,10 +95,7 @@ Ancestry getAncestry(const PhyloVec &v)
 std::string buildNewick(const Ancestry &ancestry)
 {
     // Row with 2 children of root + root node
-    std::array<int, 3> row = ancestry.back();
-    int c1 = row[0];
-    int c2 = row[1];
-    int p = row[2];
+    auto &[c1, c2, p] = ancestry.back();
 
     std::string c1_str = std::to_string(c1);
 
@@ -111,7 +107,7 @@ std::string buildNewick(const Ancestry &ancestry)
 
     std::vector<int> queue;
 
-    size_t n_max = ancestry.size();
+    int n_max = ancestry.size();
 
     if (c1 > n_max)
     {
@@ -126,16 +122,13 @@ std::string buildNewick(const Ancestry &ancestry)
     std::string sub_newick;
     std::string p_str;
 
-    for (std::size_t i = 1; i < ancestry.size(); ++i)
+    for (int i = 1; i < n_max; ++i)
     {
         next_parent = queue.back();
 
         queue.pop_back();
 
-        row = ancestry[next_parent - n_max - 1];
-        int c1 = row[0];
-        int c2 = row[1];
-        int p = row[2];
+        auto &[c1, c2, p] = ancestry[next_parent - n_max - 1];
 
         c1_str = std::to_string(c1);
         p_str = std::to_string(p);

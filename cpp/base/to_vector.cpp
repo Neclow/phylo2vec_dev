@@ -1,18 +1,16 @@
 #include "to_vector.hpp"
 
 #include <algorithm>
-#include <iostream>
 #include <unordered_map>
 
 void doReduce(Ancestry &ancestry, std::string &newick)
 {
-    size_t open_idx;
-    size_t comma_idx;
-    int child1;
-    int child2;
-    int p;
-    std::string children;
-    std::string parent;
+    size_t open_idx, comma_idx;
+
+    int child1, child2, p;
+
+    std::string children, parent, rest;
+
     for (size_t i = 0; i < newick.length(); ++i)
     {
         if (newick[i] == '(')
@@ -22,19 +20,21 @@ void doReduce(Ancestry &ancestry, std::string &newick)
         else if (newick[i] == ')')
         {
             children = newick.substr(open_idx, i - open_idx);
+
             comma_idx = children.find(',');
+
             child1 = std::stoi(children.substr(0, comma_idx));
             child2 = std::stoi(children.substr(comma_idx + 1));
 
-            parent = newick.substr(i + 1);
+            rest = newick.substr(i + 1);
 
-            parent = parent.substr(0, parent.find(',')).substr(0, parent.find(')'));
+            parent = rest.substr(0, rest.find_first_of(",)"));
 
             p = std::stoi(parent);
 
             ancestry.push_back({child1, child2, p});
 
-            newick = newick.substr(0, open_idx - 1) + newick.substr(i + 1);
+            newick = newick.substr(0, open_idx - 1) + rest;
 
             return doReduce(ancestry, newick);
         }
@@ -54,8 +54,13 @@ Ancestry reduce(std::string &newick)
 
 void toCherries(Ancestry &ancestry)
 {
-    std::sort(ancestry.begin(), ancestry.end(), [](const auto &a, const auto &b)
-              { return a[2] < b[2]; });
+    std::qsort(ancestry.data(), ancestry.size(), sizeof(std::array<int, 3>), [](const void *a, const void *b)
+               {
+              const auto& arr1 = *static_cast<const std::array<int, 3>*>(a);
+              const auto& arr2 = *static_cast<const std::array<int, 3>*>(b);
+              return arr1[2] - arr2[2]; });
+    // std::sort(ancestry.begin(), ancestry.end(), [](const auto &a, const auto &b)
+    //           { return a[2] < b[2]; });
 
     std::unordered_map<int, int> child_min;
 
@@ -80,11 +85,11 @@ PhyloVec buildVector(const Ancestry &cherries)
 {
     PhyloVec v(cherries.size());
 
-    int c_max;
+    unsigned int c_max;
 
-    int idx = -1;
+    unsigned int idx;
 
-    bool c_max_found;
+    std::vector<std::array<int, 2>> subset;
 
     for (int i = cherries.size() - 1; i >= 0; --i)
     {
@@ -92,9 +97,6 @@ PhyloVec buildVector(const Ancestry &cherries)
 
         c_max = std::max(c1, c2);
 
-        c_max_found = false;
-
-        std::vector<std::array<int, 2>> subset;
         for (size_t j = 0; j < cherries.size(); j++)
         {
             if (cherries[j][2] <= c_max)
@@ -105,20 +107,22 @@ PhyloVec buildVector(const Ancestry &cherries)
 
         for (size_t j = 0; j < subset.size(); j++)
         {
-            if ((subset[j][0] == c_max || subset[j][1] == c_max) && !c_max_found)
+            if (subset[j][0] == c_max || subset[j][1] == c_max)
             {
-                idx = static_cast<int>(j);
+                idx = static_cast<unsigned int>(j);
                 break;
             }
         }
 
         v[c_max - 1] = idx == 0 ? std::min(c1, c2) : c_max - 1 + idx;
+
+        subset.clear();
     }
 
     return v;
 }
 
-PhyloVec toVector(std::string newick)
+PhyloVec toVector(std::string &newick)
 {
     Ancestry ancestry = reduce(newick);
 
