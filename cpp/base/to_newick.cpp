@@ -2,26 +2,24 @@
 
 #include <unordered_map>
 
-Ancestry getAncestry(const PhyloVec &v)
-{
+Ancestry getAncestry(const PhyloVec &v) {
     // Matrix with 3 columns: child1, child2, parent
     Ancestry ancestry(v.size());
 
     // This is the first pair, we start with (0, 1)
     // std::vector<std::pair<int, int>> pairs; seems to be slower
     std::vector<std::array<unsigned int, 2>> pairs;
+    pairs.reserve(v.size());
 
     pairs.push_back({0, 1});
 
-    unsigned int next_leaf;
+    unsigned int nextLeaf;
 
     // The goal here is to add mergers like in the previous iteration
-    for (std::size_t i = 1; i < v.size(); ++i)
-    {
-        next_leaf = i + 1;
+    for (std::size_t i = 1; i < v.size(); ++i) {
+        nextLeaf = i + 1;
 
-        if (v[i] <= i)
-        {
+        if (v[i] <= i) {
             /*
             If v[i] <= i, it's an easy BD
             We now that the next pair to add now is (v[i], next_leaf)
@@ -30,122 +28,112 @@ Ancestry getAncestry(const PhyloVec &v)
             We initially have (0, 1), but 0 gives birth to 2 afterwards
             So the "shallowest" pair is (0, 2)
             */
-            pairs.insert(pairs.begin(), {v[i], next_leaf});
-        }
-        else
-        {
+            pairs.insert(pairs.begin(), {v[i], nextLeaf});
+        } else {
             /*
-            If v[i] > i, it's not the branch leading v[i] that gives birth but an internal branch
-            Remark: it will not be the "shallowest" pair, so we do not insert it at position 0
-            len(pairs) = number of pairings we did so far
-            So what v[i] - len(pairs) gives us is the depth of the next pairing
-            And pairs[v[i] - len(pairs) - 1][0] is a node that we processed beforehand
-            which is deeper than the branch v[i]
+            If v[i] > i, it's not the branch leading v[i] that gives birth but
+            an internal branch Remark: it will not be the "shallowest" pair, so
+            we do not insert it at position 0 len(pairs) = number of pairings we
+            did so far So what v[i] - len(pairs) gives us is the depth of the
+            next pairing And pairs[v[i] - len(pairs) - 1][0] is a node that we
+            processed beforehand which is deeper than the branch v[i]
             */
-            pairs.insert(
-                pairs.begin() + v[i] - pairs.size(),
-                {pairs[v[i] - pairs.size() - 1][0], next_leaf});
+            pairs.insert(pairs.begin() + v[i] - pairs.size(),
+                         {pairs[v[i] - pairs.size() - 1][0], nextLeaf});
         }
     }
 
-    // Dictionary to keep track of the following relationship: child->highest parent
-    std::unordered_map<int, int> parents;
+    // Keep track of the following relationship: child->highest parent
+    std::vector<int> parents(v.size() * 2 + 1, -1);
+    // Keep track of siblings (i.e., sister nodes)
+    std::vector<int> siblings(v.size() * 2 + 1, -1);
 
-    // Dictionary to keep track of siblings (i.e., sister nodes)
-    std::unordered_map<int, int> siblings;
+    int nextParent = v.size() + 1;
+    int parentOfChild1, parentofChild2;
+    int siblingOfChild1, siblingofChild2;
 
-    // Leaves are number 0, 1, ..., n_leaves - 1, so the next parent is n_leaves
-    int next_parent = v.size() + 1;
+    for (std::size_t i = 0; i < pairs.size(); ++i) {
+        auto &[c1, c2] = pairs[i];
 
-    // int child1, child2;
-    int parent_child1, parent_child2;
-    int sibling_child1, sibling_child2;
+        parentOfChild1 = parents[c1] != -1 ? parents[c1] : c1;
+        parentofChild2 = parents[c2] != -1 ? parents[c2] : c2;
 
-    for (std::size_t i = 0; i < pairs.size(); ++i)
-    {
-        auto &[child1, child2] = pairs[i];
-
-        parent_child1 = parents.find(child1) != parents.end() ? parents[child1] : child1;
-        parent_child2 = parents.find(child2) != parents.end() ? parents[child2] : child2;
-
-        ancestry[i] = {parent_child1, parent_child2, next_parent};
+        ancestry[i] = {parentOfChild1, parentofChild2, nextParent};
 
         // Change the parents of the current children
-        parents[child1] = next_parent;
-        parents[child2] = next_parent;
+        parents[c1] = nextParent;
+        parents[c2] = nextParent;
 
-        sibling_child1 = siblings.find(child1) != siblings.end() ? siblings[child1] : child1;
-        sibling_child2 = siblings.find(child2) != siblings.end() ? siblings[child2] : child2;
+        siblingOfChild1 = siblings[c1] != -1 ? siblings[c1] : c1;
+        siblingofChild2 = siblings[c2] != -1 ? siblings[c2] : c2;
 
         // Change the parents of the siblings
-        parents[sibling_child1] = next_parent;
-        parents[sibling_child2] = next_parent;
+        parents[siblingOfChild1] = nextParent;
+        parents[siblingofChild2] = nextParent;
 
         // Change the previous parents of the child if there are any
-        parents[parent_child1] = next_parent;
-        parents[parent_child1] = next_parent;
+        parents[parentOfChild1] = nextParent;
+        parents[parentofChild2] = nextParent;
 
         // Update siblings
-        ++next_parent;
+        siblings[c1] = c2;
+        siblings[c2] = c1;
+
+        ++nextParent;
     }
 
     return ancestry;
 }
 
-std::string buildNewick(const Ancestry &ancestry)
-{
+std::string buildNewick(const Ancestry &ancestry) {
     // Row with 2 children of root + root node
     auto &[c1, c2, p] = ancestry.back();
 
-    std::string c1_str = std::to_string(c1);
+    std::string c1Str = std::to_string(c1);
 
-    std::string newick = "(" + c1_str + "," + std::to_string(c2) + ")" + std::to_string(p) + ";";
+    std::string newick =
+        "(" + c1Str + "," + std::to_string(c2) + ")" + std::to_string(p) + ";";
 
-    std::unordered_map<int, int> node_idxs;
-    node_idxs = {{c1, 1},
-                 {c2, 2 + c1_str.length()}};
+    std::unordered_map<int, int> nodeIdxs;
+    nodeIdxs = {{c1, 1}, {c2, 2 + c1Str.length()}};
 
     std::vector<int> queue;
 
-    int n_max = ancestry.size();
+    int nMax = ancestry.size();
 
-    if (c1 > n_max)
-    {
+    if (c1 > nMax) {
         queue.push_back(c1);
     }
-    if (c2 > n_max)
-    {
+    if (c2 > nMax) {
         queue.push_back(c2);
     }
 
-    int next_parent;
+    int nextParent;
     std::string sub_newick;
-    std::string p_str;
+    std::string pStr;
 
-    for (int i = 1; i < n_max; ++i)
-    {
-        next_parent = queue.back();
+    for (int i = 1; i < nMax; ++i) {
+        nextParent = queue.back();
 
         queue.pop_back();
 
-        auto &[c1, c2, p] = ancestry[next_parent - n_max - 1];
+        auto &[c1, c2, p] = ancestry[nextParent - nMax - 1];
 
-        c1_str = std::to_string(c1);
-        p_str = std::to_string(p);
+        c1Str = std::to_string(c1);
+        pStr = std::to_string(p);
 
-        sub_newick = "(" + c1_str + "," + std::to_string(c2) + ")" + p_str;
+        sub_newick = "(" + c1Str + "," + std::to_string(c2) + ")" + pStr;
 
-        newick = newick.substr(0, node_idxs[p]) + sub_newick + newick.substr(node_idxs[p] + p_str.length());
+        newick = newick.substr(0, nodeIdxs[p]) + sub_newick +
+                 newick.substr(nodeIdxs[p] + pStr.length());
 
-        node_idxs[c1] = node_idxs[p] + 1;
-        node_idxs[c2] = node_idxs[c1] + 1 + c1_str.length();
+        nodeIdxs[c1] = nodeIdxs[p] + 1;
+        nodeIdxs[c2] = nodeIdxs[c1] + 1 + c1Str.length();
 
-        if (c1 > n_max)
-        {
+        if (c1 > nMax) {
             queue.push_back(c1);
         }
-        if (c2 > n_max)
-        {
+        if (c2 > nMax) {
             queue.push_back(c2);
         }
     }
@@ -153,7 +141,4 @@ std::string buildNewick(const Ancestry &ancestry)
     return newick;
 }
 
-std::string toNewick(const PhyloVec &v)
-{
-    return buildNewick(getAncestry(v));
-}
+std::string toNewick(const PhyloVec &v) { return buildNewick(getAncestry(v)); }

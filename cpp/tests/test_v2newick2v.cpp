@@ -5,7 +5,6 @@
 #include "../base/to_newick.hpp"
 #include "../base/to_vector.hpp"
 #include "../utils/random.hpp"
-// #include "../utils/validation.hpp"
 
 const int MIN_N_LEAVES = 5;
 const int MAX_N_LEAVES = 200;
@@ -21,9 +20,9 @@ INSTANTIATE_TEST_SUITE_P(RandomTests, V2Newick2VTest, ::testing::Range(MIN_N_LEA
 TEST_P(V2Newick2VTest, TestV2Newick2V)
 {
     int n_leaves = GetParam();
-    for (int _ = 0; _ < N_REPEATS; _++)
+    for (size_t _ = 0; _ < N_REPEATS; _++)
     {
-        PhyloVec v = sample(n_leaves);
+        PhyloVec v = sample(n_leaves, false);
         std::string newick = toNewick(v);
 
         PhyloVec v2 = toVector(newick);

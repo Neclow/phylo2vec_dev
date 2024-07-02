@@ -2,14 +2,16 @@
 #define TO_VECTORCORE_HPP
 
 #include <array>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "core.hpp"
 
-Ancestry reduce(std::string &newick);
+size_t getNumLeavesFromNewick(const std::string &newick);
 
 void doReduce(Ancestry &ancestry, std::string &newick);
+
+Ancestry reduce(std::string &newick);
 
 Ancestry reduceNoParents(std::string newick);
 

@@ -1,20 +1,14 @@
-#include <benchmark/benchmark.h>
-
 #include "../base/core.hpp"
 #include "../base/to_newick.hpp"
 #include "../base/to_vector.hpp"
 #include "../utils/random.hpp"
+#include <benchmark/benchmark.h>
 
-void benchToNewick(PhyloVec v)
-{
-    std::string newick = toNewick(v);
-}
+void benchToNewick(PhyloVec v) { std::string newick = toNewick(v); }
 
-static void BM_toNewick(benchmark::State &state)
-{
+static void BM_toNewick(benchmark::State &state) {
     int n = state.range(0);
-    for (auto _ : state)
-    {
+    for (auto _ : state) {
         state.PauseTiming();
         PhyloVec v = sample(n);
         state.ResumeTiming();
@@ -23,18 +17,16 @@ static void BM_toNewick(benchmark::State &state)
 }
 
 // Register the benchmark
-BENCHMARK(BM_toNewick)->RangeMultiplier(2)->Range(2, 2 << 10)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_toNewick)->Arg(1024)->Unit(benchmark::kMillisecond)->Complexity();
 
-void benchToVector(std::string newick)
-{
-    PhyloVec v = toVector(newick);
-}
+// BENCHMARK(BM_toNewick)->RangeMultiplier(2)->Range(2, 2 <<
+// 10)->Unit(benchmark::kMillisecond);
 
-static void BM_toVector(benchmark::State &state)
-{
+void benchToVector(std::string newick) { PhyloVec v = toVector(newick); }
+
+static void BM_toVector(benchmark::State &state) {
     int n = state.range(0);
-    for (auto _ : state)
-    {
+    for (auto _ : state) {
         state.PauseTiming();
         PhyloVec v = sample(n);
         std::string newick = toNewick(v);
@@ -44,7 +36,9 @@ static void BM_toVector(benchmark::State &state)
 }
 
 // Register the benchmark
-BENCHMARK(BM_toVector)->RangeMultiplier(2)->Range(2, 2 << 10)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_toVector)->Arg(1024)->Unit(benchmark::kMillisecond)->Complexity();
+// BENCHMARK(BM_toVector)->RangeMultiplier(2)->Range(2, 2 <<
+// 10)->Unit(benchmark::kMillisecond);
 
 // Run the benchmark
 BENCHMARK_MAIN();

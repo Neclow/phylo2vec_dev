@@ -1,6 +1,8 @@
 #ifndef RANDOM_HPP
 #define RANDOM_HPP
 
+#include <cstddef>
+
 #include "../base/core.hpp"
 
 /**
@@ -8,6 +10,6 @@
  *
  * @param n_leaves number of leaves
  */
-PhyloVec sample(const int &n_leaves, bool ordered = false);
+PhyloVec sample(const size_t &numLeaves, bool ordered = false);
 
 #endif // RANDOM_HPP
