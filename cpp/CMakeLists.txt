@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(phylo2vec)
 
+# set(CMAKE_C_COMPILER /usr/bin/gcc-12)
+# set(CMAKE_CXX_COMPILER /usr/bin/g++-12)
+
 # GoogleTest requires at least C++14
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

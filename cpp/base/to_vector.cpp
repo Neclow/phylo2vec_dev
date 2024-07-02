@@ -1,10 +1,9 @@
 #include "to_vector.hpp"
 #include <algorithm>
 #include <charconv>
-#include <cmath>
 #include <stdexcept>
 
-int stoi_substr(const std::string &s, size_t start, size_t *end) {
+int stoi_substr(std::string_view s, size_t start, size_t *end) {
     int value;
     auto [ptr, ec] =
         std::from_chars(s.data() + start, s.data() + s.size(), value);
@@ -16,7 +15,7 @@ int stoi_substr(const std::string &s, size_t start, size_t *end) {
     }
 }
 
-void doReduce(Ancestry &ancestry, const std::string &newick) {
+void doReduce(Ancestry &ancestry, std::string_view newick) {
     std::vector<int> stack;
     for (size_t i = 0; i < newick.length(); i++) {
         char c = newick[i];
@@ -40,7 +39,8 @@ void doReduce(Ancestry &ancestry, const std::string &newick) {
         }
     }
 }
-Ancestry reduce(std::string &newick) {
+
+Ancestry reduce(std::string_view newick) {
     Ancestry ancestry;
 
     doReduce(ancestry, newick.substr(0, newick.length() - 1));
@@ -110,7 +110,7 @@ PhyloVec buildVector(Ancestry const &cherries) {
     return v;
 }
 
-PhyloVec toVector(std::string &newick) {
+PhyloVec toVector(std::string_view newick) {
     Ancestry ancestry = reduce(newick);
 
     toCherries(ancestry);
