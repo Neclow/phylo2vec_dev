@@ -3,11 +3,12 @@
 
 #include <array>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "core.hpp"
 
-size_t getNumLeavesFromNewick(const std::string &newick);
+size_t getNumLeavesFromNewick(std::string_view newick);
 
 void doReduce(Ancestry &ancestry, std::string &newick);
 
@@ -23,6 +24,6 @@ PhyloVec buildVector(const Ancestry &cherries);
 
 PhyloVec toVector(std::string &newick);
 
-PhyloVec toVectorNoParents(std::string newick_no_parents);
+PhyloVec toVectorNoParents(std::string &newick_no_parents);
 
 #endif // TO_VECTOR_HPP
