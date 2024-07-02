@@ -76,5 +76,5 @@ add_test(NAME phylo2vec_test COMMAND phylo2vec_test)
 # include(CTest)
 
 # Benchmarking
-add_executable(bench ${BENCH_SOURCES})
-target_link_libraries(bench PUBLIC benchmark::benchmark)
+add_executable(phylo2vec_bench ${BENCH_SOURCES})
+target_link_libraries(phylo2vec_bench PUBLIC benchmark::benchmark)
