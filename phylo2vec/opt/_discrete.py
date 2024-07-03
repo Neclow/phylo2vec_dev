@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import numba as nb
 import numpy as np
 
@@ -47,6 +49,18 @@ class DiscreteOptimizer(BaseOptimizer):
     @staticmethod
     @nb.njit
     def get_rooted_edges(v: np.ndarray) -> np.ndarray:
+        """Generate a list of edges in the rooted tree
+
+        Parameters
+        ----------
+        v : np.ndarray
+            Phylo2Vec vector v
+
+        Returns
+        -------
+        edges : np.ndarray
+            List of dges in [parent, child] format
+        """
         anc = _get_ancestry(v)
 
         edges = np.zeros((2 * len(v), 2), dtype=np.int16)
@@ -60,13 +74,46 @@ class DiscreteOptimizer(BaseOptimizer):
     @staticmethod
     @nb.njit
     def get_unrooted_edges(edges_r: np.ndarray) -> np.ndarray:
+        """Convert rooted edges to unrooted edges
+
+        Parameters
+        ----------
+        edges_r : np.ndarray
+            The rooted edges
+
+        Returns
+        -------
+        edges_u : np.ndarray
+            The unrooted edges
+        """
         edges_u = edges_r[:-1].copy()
         edges_u[-2, :] = [edges_r.max() - 1, edges_r[-2:, :].min()]
         return edges_u
 
     @staticmethod
     @nb.njit
-    def get_edge_weights(n_leaves: int, D: np.ndarray, edges_u: list) -> np.ndarray:
+    def get_edge_weights(
+        n_leaves: int, D: np.ndarray, edges_u: np.ndarray
+    ) -> np.ndarray:
+        """Calculate the (balanced) distance between a leaf and a subtree
+
+        Parameters
+        ----------
+        n_leaves : int
+            Number of leaves
+        D : np.ndarray
+            Inter-taxa distance matrix
+        edges_u : list
+            Unrooted edges contained in a tree
+
+        Returns
+        -------
+        edge_weights : np.ndarray
+            Sape: (#edges, 2, #leaves)
+            (i,0,j) --> balanced distance between leaf node j and the subtree in the
+            forest created by removing edge i that does not contain the root.
+            (i,1,j) --> similar, but for the subtree not containing the root.
+        """
         n_edges = 2 * n_leaves - 3
 
         edge_weights = np.zeros((n_edges, 2, n_leaves))
@@ -123,7 +170,19 @@ class DiscreteOptimizer(BaseOptimizer):
 
     @staticmethod
     @nb.njit
-    def get_edge_locations(edges):
+    def get_edge_locations(edges: np.ndarray) -> np.ndarray:
+        """Transform the edge matrix into a list giving the edges connected to each node
+
+        Parameters
+        ----------
+        edges : np.ndarray
+            edges contained in a tree
+
+        Returns
+        -------
+        edge_locations : np.ndarray
+            One-hot encoded version of edges
+        """
         n_max = edges.max()
         edge_locations = np.zeros((n_max + 1, n_max + 1), dtype=edges.dtype)
 
@@ -135,20 +194,45 @@ class DiscreteOptimizer(BaseOptimizer):
 
     @staticmethod
     @nb.njit
-    def make_subtree(n_leaves, edges_u, i):
-        e = edges_u[i]
+    def make_subtree(
+        n_leaves: int, edges: np.ndarray, i: int
+    ) -> Tuple[np.ndarray, int]:
+        """
+        Get the subtree from the forest created by removing edges[i]
+        from the tree that does not contain the root
+
+        This iteratively builds the tree, rooting it at the node on the
+        side of the edge of interest
+
+        Parameters
+        ----------
+        n_leaves : int
+            Number of leaves
+        edges : np.ndarray
+            edge list
+        i : int
+            edge index of interest
+
+        Returns
+        -------
+        tree_edges : np.ndarray
+            Edges contained in this subtree
+        tree_size : int
+            Size of this subtree
+        """
+        e = edges[i]
 
         tree_edges = [(e[0], e[1])]
 
         to_visit = e[0]
 
-        visited = np.zeros((edges_u.max() + 1,), dtype=np.int16)
+        visited = np.zeros((edges.max() + 1,), dtype=np.int16)
 
         visited[to_visit] = 1
 
         while True:
             next_visit = -1
-            for j, new_e in enumerate(edges_u):
+            for j, new_e in enumerate(edges):
                 if j == i:
                     continue
                 if new_e[0] == to_visit and visited[new_e[1]] == 0:
