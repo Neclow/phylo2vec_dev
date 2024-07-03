@@ -35,9 +35,9 @@ Ancestry getAncestry(const PhyloVec &v) {
             an internal branch
 
             Thus, it will not be the "shallowest" pair, so we do not insert it
-            at position 0, but instead v[i] - i. (i = len(pairs))
+            at position 0, but instead at v[i] - i (i = len(pairs))
 
-            pairs[v[i] - i- 1][0] is a node that we processed
+            pairs[v[i] - i - 1][0] is a node that we processed
             beforehand which is deeper than the branch v[i]
             */
             pairs.insert(pairs.begin() + v[i] - i,
@@ -80,11 +80,11 @@ Ancestry getAncestry(const PhyloVec &v) {
         // parents[siblingOfChild1] = nextParent;
         // parents[siblingofChild2] = nextParent;
 
-        // Change the previous parents of the child if there are any
+        // // Change the previous parents of the child if there are any
         // parents[parentOfChild1] = nextParent;
         // parents[parentofChild2] = nextParent;
 
-        // Update siblings
+        // // Update siblings
         // siblings[c1] = c2;
         // siblings[c2] = c1;
 
@@ -130,7 +130,6 @@ std::string buildNewick(const Ancestry &ancestry) {
     for (int i = 1; i < leafMax; ++i) {
         // Get the next internal node and pop it from the queue
         nextParent = parentQueue.back();
-
         parentQueue.pop_back();
 
         // Get the row corresponding to the nextParent
