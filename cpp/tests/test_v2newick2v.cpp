@@ -1,11 +1,11 @@
-#include <vector>
-
-#include <gtest/gtest.h>
-
 #include "../base/to_newick.hpp"
 #include "../base/to_vector.hpp"
 #include "../utils/newick.hpp"
 #include "../utils/random.hpp"
+
+#include <gtest/gtest.h>
+
+#include <vector>
 
 const int MIN_N_LEAVES = 5;
 const int MAX_N_LEAVES = 200;

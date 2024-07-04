@@ -3,6 +3,7 @@
 #include "../base/to_vector.hpp"
 #include "../utils/newick.hpp"
 #include "../utils/random.hpp"
+
 #include <benchmark/benchmark.h>
 
 void benchToNewick(PhyloVec v) { std::string newick = toNewick(v); }

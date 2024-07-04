@@ -74,7 +74,7 @@ def _get_ancestry(v):
     parents = nb.typed.Dict.empty(key_type=nb.types.int64, value_type=nb.types.int64)
 
     # Dictionary to keep track of siblings (i.e., sister nodes)
-    siblings = nb.typed.Dict.empty(key_type=nb.types.int64, value_type=nb.types.int64)
+    # siblings = nb.typed.Dict.empty(key_type=nb.types.int64, value_type=nb.types.int64)
 
     # Leaves are number 0, 1, ..., n_leaves - 1, so the next parent is n_leaves
     next_parent = len(v) + 1
@@ -91,17 +91,17 @@ def _get_ancestry(v):
         parents[child1] = next_parent
         parents[child2] = next_parent
 
-        # Change the parents of the siblings
-        parents[siblings.get(child1, child1)] = next_parent
-        parents[siblings.get(child2, child2)] = next_parent
+        # # Change the parents of the siblings
+        # parents[siblings.get(child1, child1)] = next_parent
+        # parents[siblings.get(child2, child2)] = next_parent
 
-        # Change the previous parents of the child if there are any
-        parents[parent_child1] = next_parent
-        parents[parent_child2] = next_parent
+        # # Change the previous parents of the child if there are any
+        # parents[parent_child1] = next_parent
+        # parents[parent_child2] = next_parent
 
-        # Update siblings
-        siblings[child1] = child2
-        siblings[child2] = child1
+        # # Update siblings
+        # siblings[child1] = child2
+        # siblings[child2] = child1
 
         next_parent += 1
 
