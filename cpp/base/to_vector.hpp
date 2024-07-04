@@ -10,15 +10,13 @@
 
 size_t getNumLeavesFromNewick(std::string_view newick);
 
-void doReduce(Ancestry &ancestry, std::string_view newick);
-
 Ancestry reduce(std::string_view newick);
 
 Ancestry reduceNoParents(std::string_view newick);
 
 void toCherries(Ancestry &ancestry);
 
-Ancestry orderCherriesNoParents(Ancestry cherries);
+void toCherriesNoParents(Ancestry &ancestry);
 
 PhyloVec buildVector(const Ancestry &cherries);
 

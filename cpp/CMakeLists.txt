@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(phylo2vec)
 
-# set(CMAKE_C_COMPILER /usr/bin/gcc-12)
-# set(CMAKE_CXX_COMPILER /usr/bin/g++-12)
-
 # GoogleTest requires at least C++14
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,20 +13,6 @@ FetchContent_Declare(
     GIT_TAG release-1.11.0 # dpkg -l libgtest-dev
 )
 FetchContent_MakeAvailable(googletest)
-
-# Include cxxopts using FetchContent
-# FetchContent_Declare(
-#     cxxopts
-#     GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
-#     GIT_TAG v3.1.1
-# )
-# FetchContent_MakeAvailable(cxxopts)
-
-# # Find OpenMP package
-# find_package(OpenMP REQUIRED)
-
-# # Set compiler flags for OpenMP
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
@@ -46,28 +29,16 @@ set(SOURCES
     utils/validation.cpp
 )
 
-# Test
-set(TEST_SOURCES
-    ${SOURCES}
-    tests/test_v2newick2v.cpp
-)
-
-# Benchmark
-set(BENCH_SOURCES
-    ${SOURCES}
-    benchmarks/bench_base.cpp
-)
+# Main library
+add_library(phylo2vec ${SOURCES})
 
 # Main executable
-add_executable(phylo2vec main.cpp ${SOURCES})
-# Include directories
-# target_include_directories(phylo2vec PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/base)
+add_executable(phylo2vec_main main.cpp ${SOURCES})
 
-# Link against cxxopts
-# target_link_libraries(phylo2vec PRIVATE cxxopts::cxxopts) ## OpenMP::OpenMP_CXX)
+target_link_libraries(phylo2vec_main phylo2vec)
 
 # Test executable
-add_executable(phylo2vec_test ${TEST_SOURCES})
+add_executable(phylo2vec_test tests/test_v2newick2v.cpp ${SOURCES})
 
 # Link against Google Test and Google Mock
 target_link_libraries(phylo2vec_test PRIVATE gtest_main)
@@ -75,9 +46,8 @@ target_link_libraries(phylo2vec_test PRIVATE gtest_main)
 # Add tests
 add_test(NAME phylo2vec_test COMMAND phylo2vec_test)
 
-# Optionally, add a test target (for running tests using CTest)
-# include(CTest)
-
 # Benchmarking
-add_executable(phylo2vec_bench ${BENCH_SOURCES})
+add_executable(phylo2vec_bench benchmarks/bench_base.cpp ${SOURCES})
+
+# Link against Google benchmark
 target_link_libraries(phylo2vec_bench PUBLIC benchmark::benchmark)
