@@ -4,8 +4,6 @@
 #include <set>
 #include <stdexcept>
 
-#include <iostream>
-
 int stoi_substr(std::string_view s, size_t start, size_t *end) {
     int value;
     auto [ptr, ec] =
@@ -45,14 +43,6 @@ Ancestry reduce(std::string_view newick) {
             stack.push_back(p);
             i = end - 1;
         }
-
-        // std::cout << i << std::endl;
-
-        // for (auto elm : stack) {
-        //     std::cout << elm << " ";
-        // }
-
-        // std::cout << std::endl;
     }
 
     return ancestry;
@@ -88,12 +78,6 @@ Ancestry reduceNoParents(std::string_view newick) {
             stack.push_back(p);
             i = end - 1;
         }
-
-        for (auto elm : stack) {
-            std::cout << elm << " ";
-        }
-
-        std::cout << std::endl;
     }
 
     return ancestry;
