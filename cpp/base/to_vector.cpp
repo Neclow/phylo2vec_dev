@@ -21,10 +21,10 @@ Ancestry reduce(std::string_view newick) {
 
     std::vector<int> stack;
 
-    for (size_t i = 0; i < newick.length(); i++) {
+    for (size_t i = 0; i < newick.length(); ++i) {
         char c = newick[i];
         if (c == ')') {
-            i++;
+            ++i;
             size_t end;
             int p = stoi_substr(newick, i, &end);
             i = end - 1;
@@ -53,7 +53,7 @@ Ancestry reduceNoParents(std::string_view newick) {
 
     std::vector<int> stack;
 
-    for (size_t i = 0; i < newick.length(); i++) {
+    for (size_t i = 0; i < newick.length(); ++i) {
         char c = newick[i];
 
         if (c == ')') {

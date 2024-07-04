@@ -307,7 +307,7 @@ def add_leaf(v, leaf, pos):
         Phylo2Vec vector
     leaf : int >= 0
         A leaf node to add
-    leaf : int >= 0
+    pos : int >= 0
         A branch from where the leaf will be added
 
     Returns
