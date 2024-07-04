@@ -1,14 +1,56 @@
 #include "base/core.hpp"
 #include "base/to_newick.hpp"
 #include "base/to_vector.hpp"
+#include "utils/newick.hpp"
 #include "utils/random.hpp"
 
-// #include<iostream>
+#include <iostream>
 
 int main() {
-    PhyloVec v = sample(7, false);
+    PhyloVec v = sample(2000, false);
 
     std::string newick = toNewick(v);
+
+    // Ancestry anc = reduce(newick);
+
+    // toCherries(anc);
+
+    // for (auto row : anc) {
+    //     for (auto elm : row) {
+    //         std::cout << elm << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+
+    // std::cout << std::endl;
+
+    removeParentLabels(newick);
+
+    // std::cout << newick << std::endl;
+
+    Ancestry ancNoParents = reduceNoParents(newick);
+
+    // toCherriesNoParents(ancNoParents);
+
+    // for (auto row : ancNoParents) {
+    //     for (auto elm : row) {
+    //         std::cout << elm << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+
+    // std::cout << std::endl;
+
+    // std::cout << "to cherries" << std::endl;
+
+    toCherriesNoParents(ancNoParents);
+
+    // for (auto row : ancNoParents) {
+    //     for (auto elm : row) {
+    //         std::cout << elm << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
 
     // for (auto elm : v) {
     //     std::cout << elm << " ";

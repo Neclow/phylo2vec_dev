@@ -1,7 +1,6 @@
 #include "to_vector.hpp"
 #include <algorithm>
 #include <charconv>
-#include <set>
 #include <stdexcept>
 
 int stoi_substr(std::string_view s, size_t start, size_t *end) {
@@ -57,11 +56,6 @@ Ancestry reduceNoParents(std::string_view newick) {
         char c = newick[i];
 
         if (c == ')') {
-            // i++;
-            // size_t end;
-            // int p = stoi_substr(newick, i, &end);
-            // i = end - 1;
-
             int c2 = stack.back();
             stack.pop_back();
 
@@ -84,7 +78,7 @@ Ancestry reduceNoParents(std::string_view newick) {
 }
 
 void toCherries(Ancestry &ancestry) {
-    size_t numLeaves = ancestry.size();
+    const size_t numLeaves = ancestry.size();
 
     std::qsort(ancestry.data(), numLeaves, sizeof(std::array<int, 3>),
                [](const void *a, const void *b) {
@@ -114,26 +108,26 @@ void toCherries(Ancestry &ancestry) {
 }
 
 void toCherriesNoParents(Ancestry &ancestry) {
-    int numCherries = ancestry.size();
+    const int numCherries = ancestry.size();
 
-    std::vector<int> idxs(numCherries);
+    Ancestry oldAncestry = ancestry;
+
+    std::vector<std::uint8_t> idxs(numCherries, 0);
 
     for (int i = 0; i < numCherries; ++i) {
+        std::vector<std::uint8_t> d(2 * numCherries, 0);
         int maxLeaf = -1;
-
-        std::set<int> d;
 
         int idx;
 
         for (int j = 0; j < numCherries; ++j) {
-            int c1 = ancestry[j][0];
-            int c2 = ancestry[j][1];
+            auto &[c1, c2, _] = oldAncestry[j];
 
-            if (std::find(idxs.begin(), idxs.end(), j) != idxs.end()) {
+            if (idxs[j]) {
                 continue;
             }
 
-            if (!(d.find(c1) != d.end() || d.find(c2) != d.end())) {
+            if (!(d[c1] || d[c2])) {
                 bool c1_is_leaf = c1 <= numCherries;
                 bool c2_is_leaf = c2 <= numCherries;
                 if (c1_is_leaf && !(c2_is_leaf)) {
@@ -157,21 +151,18 @@ void toCherriesNoParents(Ancestry &ancestry) {
                 }
             }
 
-            d.insert(c1);
-            d.insert(c2);
+            d[c1] = 1;
+            d[c2] = 1;
         }
 
-        idxs[i] = idx;
-    }
+        idxs[idx] = 1;
 
-    // Apply order determined by idxs
-    for (int i = 0; i < numCherries; ++i) {
-        ancestry[i] = ancestry[idxs[i]];
+        ancestry[i] = oldAncestry[idx];
     }
 }
 
 PhyloVec buildVector(Ancestry const &cherries) {
-    size_t numLeaves = cherries.size();
+    const size_t numLeaves = cherries.size();
 
     PhyloVec v(numLeaves);
 

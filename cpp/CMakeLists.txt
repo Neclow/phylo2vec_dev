@@ -27,6 +27,7 @@ set(SOURCES
     base/to_vector.cpp
     utils/random.cpp
     utils/validation.cpp
+    utils/newick.cpp
 )
 
 # Main library
