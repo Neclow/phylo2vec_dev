@@ -8,15 +8,49 @@
 
 #include "core.hpp"
 
-size_t getNumLeavesFromNewick(std::string_view newick);
+/**
+ * @brief get all "cherries" from a Newick string with parents
+ *
+ * @code
+ * std::string newick = (((0,4)5,2)7,(1,3)6)8;
+ * Ancestry cherries = getCherries(newick);
+ * // cherries =
+ * // 0 4 5
+ * // 5 2 7
+ * // 1 3 6
+ * // 7 6 8
+ * @endcode
+ * @param newick Newick string with parents
+ * @return Ancestry: vector of triplets {child1, child1, parent}
+ */
+Ancestry getCherries(std::string_view newick);
 
-Ancestry reduce(std::string_view newick);
+Ancestry getCherriesNoParents(std::string_view newick);
 
-Ancestry reduceNoParents(std::string_view newick);
+/**
+ * @brief order all cherries according to their height
+ * (i.e., from leaf-level cherries to the root-level pairs)
+ * while traversing the cherry-list, we replace the internal node
+ * by their smallest descending leaf
+ *
+ * @code
+ * // cherries =
+ * // 0 4 5
+ * // 5 2 7
+ * // 1 3 6
+ * // 7 6 8
+ * orderCherries(cherries);
+ * // output =
+ * // 0 4 4
+ * // 1 3 3
+ * // 0 2 2
+ * // 0 1 1
+ * @endcode
+ * @param ancestry
+ */
+void orderCherries(Ancestry &ancestry);
 
-void toCherries(Ancestry &ancestry);
-
-void toCherriesNoParents(Ancestry &ancestry);
+void orderCherriesNoParents(Ancestry &ancestry);
 
 PhyloVec buildVector(const Ancestry &cherries);
 

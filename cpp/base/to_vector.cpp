@@ -16,7 +16,7 @@ int stoi_substr(std::string_view s, size_t start, size_t *end) {
     }
 }
 
-Ancestry reduce(std::string_view newick) {
+Ancestry getCherries(std::string_view newick) {
     Ancestry ancestry;
 
     std::vector<int> stack;
@@ -48,7 +48,7 @@ Ancestry reduce(std::string_view newick) {
     return ancestry;
 }
 
-Ancestry reduceNoParents(std::string_view newick) {
+Ancestry getCherriesNoParents(std::string_view newick) {
     Ancestry ancestry;
 
     std::vector<int> stack;
@@ -78,7 +78,7 @@ Ancestry reduceNoParents(std::string_view newick) {
     return ancestry;
 }
 
-void toCherries(Ancestry &ancestry) {
+void orderCherries(Ancestry &ancestry) {
     const size_t numLeaves = ancestry.size();
 
     std::qsort(ancestry.data(), numLeaves, sizeof(std::array<int, 3>),
@@ -108,7 +108,7 @@ void toCherries(Ancestry &ancestry) {
     }
 }
 
-void toCherriesNoParents(Ancestry &ancestry) {
+void orderCherriesNoParents(Ancestry &ancestry) {
     const int numCherries = ancestry.size();
 
     Ancestry oldAncestry = ancestry;
@@ -195,9 +195,9 @@ PhyloVec buildVector(Ancestry const &cherries) {
 }
 
 PhyloVec toVector(std::string_view newick) {
-    Ancestry ancestry = reduce(newick.substr(0, newick.length() - 1));
+    Ancestry ancestry = getCherries(newick.substr(0, newick.length() - 1));
 
-    toCherries(ancestry);
+    orderCherries(ancestry);
 
     PhyloVec v = buildVector(ancestry);
 
@@ -205,9 +205,10 @@ PhyloVec toVector(std::string_view newick) {
 }
 
 PhyloVec toVectorNoParents(std::string_view newick) {
-    Ancestry ancestry = reduceNoParents(newick.substr(0, newick.length() - 1));
+    Ancestry ancestry =
+        getCherriesNoParents(newick.substr(0, newick.length() - 1));
 
-    toCherriesNoParents(ancestry);
+    orderCherriesNoParents(ancestry);
 
     PhyloVec v = buildVector(ancestry);
 

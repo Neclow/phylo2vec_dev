@@ -1,11 +1,5 @@
 #include "newick.hpp"
 
-#include <algorithm>
-#include <charconv>
-#include <stdexcept>
-
-#include <iostream>
-
 void removeParentLabels(std::string &newick) {
     int open_idx = -1;
     const std::string delimiters = ",);";

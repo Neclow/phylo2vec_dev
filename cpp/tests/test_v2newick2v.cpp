@@ -35,15 +35,15 @@ TEST_P(V2Newick2VTest, Cherries) {
     PhyloVec v = sample(n_leaves, false);
     std::string newick = toNewick(v);
 
-    Ancestry anc = reduce(newick);
+    Ancestry anc = getCherries(newick);
 
-    toCherries(anc);
+    orderCherries(anc);
 
     removeParentLabels(newick);
 
-    Ancestry ancNoParents = reduceNoParents(newick);
+    Ancestry ancNoParents = getCherriesNoParents(newick);
 
-    toCherriesNoParents(ancNoParents);
+    orderCherriesNoParents(ancNoParents);
 
     ASSERT_TRUE(std::equal(anc.begin(), anc.end(), ancNoParents.begin()));
 }

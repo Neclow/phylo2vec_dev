@@ -7,9 +7,11 @@
 #include <iostream>
 
 int main() {
-    PhyloVec v = sample(2000, false);
+    PhyloVec v = sample(5, false);
 
     std::string newick = toNewick(v);
+
+    // newick = "(((0,4)5,2)7,(1,3)6)8;";
 
     newick = "(((((((tip_0,tip_1),(tip_2,tip_3)),(tip_4,tip_5)),tip_6),tip_7),("
              "((tip_8,tip_9),tip_10),tip_11)),tip_12);";
