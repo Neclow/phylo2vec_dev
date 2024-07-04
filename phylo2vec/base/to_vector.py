@@ -84,22 +84,23 @@ def _find_cherries(ancestry):
 
 @nb.njit(cache=True)
 def _order_cherries_no_parents(cherries):
+    old_cherries = cherries.copy()
+
     n_cherries = cherries.shape[0]
 
-    idxs = np.zeros((n_cherries,), dtype=np.int32) - 1
+    idxs = np.zeros((n_cherries,), dtype=np.int32)
 
     for i in range(n_cherries):
+        d = np.zeros((2 * n_cherries,), dtype=np.uint8)
         max_leaf = -1
 
-        d = set()
-
-        for j, ch in enumerate(cherries):
+        for j, ch in enumerate(old_cherries):
             c1, c2, _ = ch
 
-            if j in idxs:
+            if idxs[j] == 1:
                 continue
 
-            if not (c1 in d or c2 in d):
+            if not (d[c1] == 1 or d[c2] == 1):
                 if c1 <= n_cherries and c2 > n_cherries:
                     if c1 > max_leaf:
                         max_leaf = c1
@@ -115,12 +116,15 @@ def _order_cherries_no_parents(cherries):
                         idx = j
                 else:
                     idx = j
-            d.add(c1)
-            d.add(c2)
 
-        idxs[i] = idx
+            d[c1] = 1
+            d[c2] = 1
 
-    return cherries[idxs]
+        idxs[idx] = 1  # idx
+
+        cherries[i] = old_cherries[idx]
+
+    return cherries
 
 
 @nb.njit(cache=True)

@@ -6,6 +6,9 @@
 
 #include <benchmark/benchmark.h>
 
+constexpr int NUM_LEAVES = 1024;
+
+// Benchmark toNewick
 void benchToNewick(PhyloVec v) { std::string newick = toNewick(v); }
 
 static void BM_toNewick(benchmark::State &state) {
@@ -18,12 +21,12 @@ static void BM_toNewick(benchmark::State &state) {
     }
 }
 
-// Register the benchmark
-BENCHMARK(BM_toNewick)->Arg(1024)->Unit(benchmark::kMillisecond)->Complexity();
+BENCHMARK(BM_toNewick)
+    ->Arg(NUM_LEAVES)
+    ->Unit(benchmark::kMillisecond)
+    ->Complexity();
 
-// BENCHMARK(BM_toNewick)->RangeMultiplier(2)->Range(2, 2 <<
-// 10)->Unit(benchmark::kMillisecond);
-
+// Benchmark toVector
 void benchToVector(std::string newick) { PhyloVec v = toVector(newick); }
 
 static void BM_toVector(benchmark::State &state) {
@@ -37,15 +40,14 @@ static void BM_toVector(benchmark::State &state) {
     }
 }
 
-// Register the benchmark
-BENCHMARK(BM_toVector)->Arg(1024)->Unit(benchmark::kMillisecond)->Complexity();
-// BENCHMARK(BM_toVector)->RangeMultiplier(2)->Range(2, 2 <<
-// 10)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_toVector)
+    ->Arg(NUM_LEAVES)
+    ->Unit(benchmark::kMillisecond)
+    ->Complexity();
 
+// Benchmark toVectorNoParents
 void benchToVectorNoParents(std::string newick) {
-    // PhyloVec v = toVectorNoParents(newick);
-
-    toVectorNoParents(newick);
+    PhyloVec v = toVectorNoParents(newick);
 }
 
 static void BM_toVectorNoParents(benchmark::State &state) {
@@ -55,14 +57,13 @@ static void BM_toVectorNoParents(benchmark::State &state) {
         PhyloVec v = sample(n);
         std::string newick = toNewick(v);
         removeParentLabels(newick);
-        // Ancestry anc = reduceNoParents(newick);
         state.ResumeTiming();
         benchToVectorNoParents(newick);
     }
 }
 
 BENCHMARK(BM_toVectorNoParents)
-    ->Arg(1024)
+    ->Arg(NUM_LEAVES)
     ->Unit(benchmark::kMillisecond)
     ->Complexity();
 
