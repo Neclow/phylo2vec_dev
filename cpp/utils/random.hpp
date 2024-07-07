@@ -1,8 +1,6 @@
 #ifndef RANDOM_HPP
 #define RANDOM_HPP
 
-#include <cstddef>
-
 #include "../base/core.hpp"
 
 /**

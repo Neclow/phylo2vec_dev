@@ -28,6 +28,13 @@ set(SOURCES
     utils/random.cpp
     utils/validation.cpp
     utils/newick.cpp
+    utils/vector.cpp
+)
+
+set(TEST_SOURCES
+    tests/test_main.cpp
+    tests/test_v2newick2v.cpp
+    tests/test_utils.cpp
 )
 
 # Main library
@@ -39,7 +46,7 @@ add_executable(phylo2vec_main main.cpp ${SOURCES})
 target_link_libraries(phylo2vec_main phylo2vec)
 
 # Test executable
-add_executable(phylo2vec_test tests/test_v2newick2v.cpp ${SOURCES})
+add_executable(phylo2vec_test ${TEST_SOURCES} ${SOURCES})
 
 # Link against Google Test and Google Mock
 target_link_libraries(phylo2vec_test PRIVATE gtest_main)

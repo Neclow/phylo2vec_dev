@@ -2,14 +2,11 @@
 #include "../base/to_vector.hpp"
 #include "../utils/newick.hpp"
 #include "../utils/random.hpp"
+#include "config.cpp"
 
 #include <gtest/gtest.h>
 
 #include <vector>
-
-const int MIN_N_LEAVES = 5;
-const int MAX_N_LEAVES = 200;
-const int N_REPEATS = 10;
 
 class V2Newick2VTest : public ::testing::TestWithParam<int> {
   protected:
@@ -19,9 +16,9 @@ INSTANTIATE_TEST_SUITE_P(RandomTests, V2Newick2VTest,
                          ::testing::Range(MIN_N_LEAVES, MAX_N_LEAVES));
 
 TEST_P(V2Newick2VTest, V2Newick2V) {
-    int n_leaves = GetParam();
+    int numLeaves = GetParam();
     for (size_t _ = 0; _ < N_REPEATS; _++) {
-        PhyloVec v = sample(n_leaves, false);
+        PhyloVec v = sample(numLeaves, false);
         std::string newick = toNewick(v);
 
         PhyloVec v2 = toVector(newick);
@@ -31,8 +28,8 @@ TEST_P(V2Newick2VTest, V2Newick2V) {
 }
 
 TEST_P(V2Newick2VTest, Cherries) {
-    int n_leaves = GetParam();
-    PhyloVec v = sample(n_leaves, false);
+    int numLeaves = GetParam();
+    PhyloVec v = sample(numLeaves, false);
     std::string newick = toNewick(v);
 
     Ancestry anc = getCherries(newick);
@@ -46,9 +43,4 @@ TEST_P(V2Newick2VTest, Cherries) {
     orderCherriesNoParents(ancNoParents);
 
     ASSERT_TRUE(std::equal(anc.begin(), anc.end(), ancNoParents.begin()));
-}
-
-int main(int argc, char **argv) {
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

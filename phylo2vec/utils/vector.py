@@ -236,6 +236,7 @@ def _find_indices_of_first_leaf(ancestry, leaf):
     for r in range(ancestry.shape[0]):
         for c in range(ancestry.shape[1]):
             if ancestry[r, c] == leaf:
+                print(r, c)
                 return r, c
 
 
@@ -260,6 +261,8 @@ def remove_leaf(v, leaf):
 
     # get the triplets from v
     ancestry = _get_ancestry(v)
+
+    print(ancestry)
 
     # Find the first rows and columns containg the leaf to remove
     r, c = _find_indices_of_first_leaf(ancestry, leaf)
@@ -288,14 +291,16 @@ def remove_leaf(v, leaf):
                 if ancestry_sub[row, col] >= parent:
                     ancestry_sub[row, col] -= 1
 
+    print(ancestry_sub)
     # We now have a correct ancestry without "leaf"
     # So we build a vector from it
 
     # Cherries have to be ordered according to the scheme presented in Fig. 2
-    # Build the new vector
     # NOTE: not 100% sure why I need both orderings?
     cherries = _order_cherries(ancestry_sub)
     cherries_no_parents = _order_cherries_no_parents(cherries)
+
+    # Build the new vector
     v_sub = _build_vector(cherries_no_parents)
 
     return v_sub, sister
@@ -344,9 +349,8 @@ def add_leaf(v, leaf, pos):
     ancestry_add[r_leaf, c_leaf] = leaf
 
     # Find the cherries
-    # TODO: check why I did two orderings, super weird
+    # NOTE: not 100% sure why I need both orderings?
     cherries = _order_cherries(ancestry_add)
-
     cherries_no_parents = _order_cherries_no_parents(cherries)
 
     # Build the new vector

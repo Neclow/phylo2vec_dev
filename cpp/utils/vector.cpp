@@ -5,13 +5,17 @@
 
 std::pair<size_t, size_t> findCoordsOfFirstLeaf(const Ancestry &ancestry,
                                                 const int &leaf) {
+    std::pair<size_t, size_t> coords;
     for (size_t r = 0; r < ancestry.size(); ++r) {
         for (size_t c = 0; c < 3; ++c) {
             if (ancestry[r][c] == leaf) {
-                return std::make_pair(r, c);
+                coords = std::make_pair(r, c);
+                break;
             }
         }
     }
+
+    return coords;
 }
 
 void addLeaf(PhyloVec &v, const unsigned int &leaf, const unsigned int &pos) {
@@ -54,28 +58,27 @@ void addLeaf(PhyloVec &v, const unsigned int &leaf, const unsigned int &pos) {
 
 unsigned int removeLeaf(PhyloVec &v, const unsigned int &leaf) {
     Ancestry ancestry = getAncestry(v);
-
     std::pair<size_t, size_t> leafCoords =
-        findCoordsOfFirstLeaf(ancestry, v.size());
+        findCoordsOfFirstLeaf(ancestry, leaf);
 
     size_t leafRow = leafCoords.first;
     size_t leafCol = leafCoords.second;
 
     // Find the parent of the leaf to remove
-    unsigned int parent = ancestry[leafRow][3];
+    unsigned int parent = ancestry[leafRow][2];
     unsigned int sister = ancestry[leafRow][1 - leafCol];
 
-    Ancestry ancestryRm;
+    Ancestry ancestryRm(ancestry.size() - 1);
 
-    for (size_t r = 0; r < ancestry.size(); ++r) {
+    for (size_t r = 0; r < ancestry.size() - 1; ++r) {
         if (r < leafRow) {
-            ancestryRm.push_back(ancestry[r]);
+            ancestryRm[r] = ancestry[r];
         } else {
-            ancestryRm.push_back(ancestry[r + 1]);
+            ancestryRm[r] = ancestry[r + 1];
         }
 
         for (size_t c = 0; c < 3; ++c) {
-            int node = ancestryRm[r][c];
+            unsigned int node = ancestryRm[r][c];
             if (node == parent) {
                 node = sister;
             }
@@ -93,6 +96,9 @@ unsigned int removeLeaf(PhyloVec &v, const unsigned int &leaf) {
             ancestryRm[r][c] = node;
         }
     }
+
+    // We now have a correct ancestry without "leaf"
+    // So we build a vector from it
 
     orderCherries(ancestryRm);
 

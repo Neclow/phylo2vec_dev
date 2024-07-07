@@ -16,11 +16,6 @@ from phylo2vec.base.to_vector import (
 from phylo2vec.utils import sample
 
 
-MIN_N_LEAVES = 5
-MAX_N_LEAVES = 200
-N_REPEATS = 10
-
-
 @pytest.mark.parametrize("n_leaves", range(MIN_N_LEAVES, MAX_N_LEAVES + 1))
 def test_v2newick2v(n_leaves):
     """Test that v to newick to converted_v leads to v == converted_v

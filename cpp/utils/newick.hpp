@@ -7,7 +7,7 @@ const std::string startDelimiters = "(,";
 const std::string endDelimiters = ",);";
 
 void removeAnnotations(std::string &newick, const char delimiter,
-                       const bool keepDelimiter);
+                       int keepDelimiter);
 void removeParentLabels(std::string &newick);
 void removeBranchAnnotations(std::string &newick);
 std::string toStringNewick(Converter converter);
