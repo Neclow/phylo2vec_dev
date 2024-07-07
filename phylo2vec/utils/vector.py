@@ -293,15 +293,15 @@ def remove_leaf(v, leaf):
 
     # Cherries have to be ordered according to the scheme presented in Fig. 2
     # Build the new vector
-    # TODO: check why I did two orderings, super weird
-    # cherries = _order_cherries(ancestry_sub)
-    # v_sub = _build_vector(_order_cherries_no_parents(cherries))
-    v_sub = _order_cherries(ancestry_sub)
+    # NOTE: not 100% sure why I need both orderings?
+    cherries = _order_cherries(ancestry_sub)
+    cherries_no_parents = _order_cherries_no_parents(cherries)
+    v_sub = _build_vector(cherries_no_parents)
 
     return v_sub, sister
 
 
-@nb.njit
+@nb.njit(cache=True)
 def add_leaf(v, leaf, pos):
     """Add a leaf to a Phylo2Vec vector v
 
@@ -345,10 +345,11 @@ def add_leaf(v, leaf, pos):
 
     # Find the cherries
     # TODO: check why I did two orderings, super weird
-    # cherries = _order_cherries_no_parents(_find_cherries(ancestry_add))
     cherries = _order_cherries(ancestry_add)
 
+    cherries_no_parents = _order_cherries_no_parents(cherries)
+
     # Build the new vector
-    v_add = _build_vector(cherries)
+    v_add = _build_vector(cherries_no_parents)
 
     return v_add

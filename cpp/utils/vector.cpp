@@ -46,6 +46,8 @@ void addLeaf(PhyloVec &v, const unsigned int &leaf, const unsigned int &pos) {
     // Re-order the cherries
     orderCherries(ancestryAdd);
 
+    orderCherriesNoParents(ancestryAdd);
+
     // Build the new vector
     v = buildVector(ancestryAdd);
 }
@@ -91,6 +93,8 @@ unsigned int removeLeaf(PhyloVec &v, const unsigned int &leaf) {
             ancestryRm[r][c] = node;
         }
     }
+
+    orderCherries(ancestryRm);
 
     orderCherriesNoParents(ancestryRm);
 
