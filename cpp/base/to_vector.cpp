@@ -19,28 +19,35 @@ int stoi_substr(std::string_view s, size_t start, size_t *end) {
 Ancestry getCherries(std::string_view newick) {
     Ancestry ancestry;
 
+    // Stack of nodes
     std::vector<int> stack;
 
     for (size_t i = 0; i < newick.length(); ++i) {
         char c = newick[i];
         if (c == ')') {
             ++i;
+
+            // Get the parent node after )
             size_t end;
             int p = stoi_substr(newick, i, &end);
             i = end - 1;
 
+            // Pop the children nodes from the stack
             int c2 = stack.back();
             stack.pop_back();
 
             int c1 = stack.back();
             stack.pop_back();
 
+            // Add the triplet (c1, c2, p)
             ancestry.push_back({c1, c2, p});
+            // Push the parent node to the stack
             stack.push_back(p);
         } else if (c >= '0' && c <= '9') {
+            // Get the next node and push it the stack
             size_t end;
-            int p = stoi_substr(newick, i, &end);
-            stack.push_back(p);
+            int n = stoi_substr(newick, i, &end);
+            stack.push_back(n);
             i = end - 1;
         }
     }
@@ -167,28 +174,28 @@ PhyloVec buildVector(Ancestry const &cherries) {
 
     PhyloVec v(numLeaves);
 
-    int c_max;
+    int cMax;
 
     int idx;
 
     for (int i = numLeaves - 1; i >= 0; --i) {
         auto &[c1, c2, p] = cherries[i];
 
-        c_max = std::max(c1, c2);
+        cMax = std::max(c1, c2);
 
         idx = 0;
 
         for (size_t j = 0; j < numLeaves; j++) {
-            if (cherries[j][2] <= c_max) {
-                if (cherries[j][0] == c_max || cherries[j][1] == c_max) {
+            if (cherries[j][2] <= cMax) {
+                if (cherries[j][0] == cMax || cherries[j][1] == cMax) {
                     break;
                 } else {
-                    idx++;
+                    ++idx;
                 }
             }
         }
 
-        v[c_max - 1] = idx == 0 ? std::min(c1, c2) : c_max - 1 + idx;
+        v[cMax - 1] = idx == 0 ? std::min(c1, c2) : cMax - 1 + idx;
     }
 
     return v;

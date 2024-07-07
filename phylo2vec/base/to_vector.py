@@ -64,7 +64,7 @@ def _reduce_no_parents(newick):
 
 
 @nb.njit(cache=True)
-def _find_cherries(ancestry):
+def _order_cherries(ancestry):
     ancestry_sorted = ancestry[np.argsort(ancestry[:, -1]), :]
 
     small_children = nb.typed.Dict.empty(
@@ -162,7 +162,7 @@ def to_vector(newick):
     """
     ancestry = _reduce(newick)
 
-    cherries = _find_cherries(ancestry)
+    cherries = _order_cherries(ancestry)
 
     v = _build_vector(cherries)
 

@@ -1,6 +1,11 @@
 #ifndef TO_NEWICK_HPP
 #define TO_NEWICK_HPP
 
+/**
+ * @file to_vector.hpp
+ * @brief Vector-to-Newick conversion functions
+ */
+
 #include <array>
 #include <string>
 #include <vector>

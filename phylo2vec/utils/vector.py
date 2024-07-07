@@ -10,7 +10,7 @@ from ete3 import Tree
 from phylo2vec.base.to_newick import _get_ancestry, to_newick
 from phylo2vec.base.to_vector import (
     _build_vector,
-    _find_cherries,
+    _order_cherries,
     _order_cherries_no_parents,
     to_vector_no_parents,
 )
@@ -63,7 +63,7 @@ def reorder_v(reorder_method, v_old, label_mapping_old):
     )
 
     # Re-build v
-    v_new = _build_vector(_find_cherries(ancestry_new))
+    v_new = _build_vector(_order_cherries(ancestry_new))
 
     return v_new, label_mapping_new
 
@@ -254,6 +254,8 @@ def remove_leaf(v, leaf):
     -------
     v_sub : numpy.ndarray
         Phylo2Vec vector without `leaf`
+    sister : int
+        Sister node of leaf
     """
 
     # get the triplets from v
@@ -288,11 +290,13 @@ def remove_leaf(v, leaf):
 
     # We now have a correct ancestry without "leaf"
     # So we build a vector from it
-    cherries = _find_cherries(ancestry_sub)
 
     # Cherries have to be ordered according to the scheme presented in Fig. 2
     # Build the new vector
-    v_sub = _build_vector(_order_cherries_no_parents(cherries))
+    # TODO: check why I did two orderings, super weird
+    # cherries = _order_cherries(ancestry_sub)
+    # v_sub = _build_vector(_order_cherries_no_parents(cherries))
+    v_sub = _order_cherries(ancestry_sub)
 
     return v_sub, sister
 
@@ -340,7 +344,9 @@ def add_leaf(v, leaf, pos):
     ancestry_add[r_leaf, c_leaf] = leaf
 
     # Find the cherries
-    cherries = _order_cherries_no_parents(_find_cherries(ancestry_add))
+    # TODO: check why I did two orderings, super weird
+    # cherries = _order_cherries_no_parents(_find_cherries(ancestry_add))
+    cherries = _order_cherries(ancestry_add)
 
     # Build the new vector
     v_add = _build_vector(cherries)

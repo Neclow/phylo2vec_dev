@@ -1,5 +1,32 @@
 # Benchmark stats
 
+## Python example
+
+```ipython
+from phylo2vec.base import to_newick
+from phylo2vec.utils import sample
+# Sample a 1024-leaf tree
+v = sample(1024)
+# Compile
+to_newick(v)
+# Run timeit
+%timeit to_newick(v);
+```
+
+## C++ example
+
+```bash
+# Modify cpp/benchmarks/bench.cpp accordingly
+cd cpp
+mkdir build
+cd build
+cmake ..
+make
+./phylo2vec_bench
+```
+
+## Summary table
+
 Approx. execution times (ms)
 
 |                      | size | cpp  | python |

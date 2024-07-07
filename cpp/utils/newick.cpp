@@ -1,67 +1,69 @@
 #include "newick.hpp"
 
-void removeParentLabels(std::string &newick) {
-    int open_idx = -1;
-    const std::string delimiters = ",);";
+void removeAnnotations(std::string &newick, const char delimiter,
+                       int keepDelimiter) {
+    int openIdx = -1;
     for (size_t i = 0; i < newick.size(); ++i) {
-        if (delimiters.find(newick[i]) != std::string::npos && open_idx != -1) {
-            newick.erase(open_idx, i - open_idx);
-            i -= i - open_idx;
-            open_idx = -1;
+        char c = newick[i];
+        // c is an end delimiter and the reading frame is open
+        // erase what is between ')' and c
+        // (i.e., the annotation of interest)
+        if (endDelimiters.find(c) != std::string::npos && openIdx != -1) {
+            size_t length = i - openIdx;
+            newick.erase(openIdx, length);
+            // Roll back i to the index before the substring
+            i -= length;
+            // close the reading frame
+            openIdx = -1;
         }
-        if (newick[i] == ')') {
-            open_idx = i + 1;
+        // c is a delimiter --> open the reading frame
+        if (c == delimiter) {
+            openIdx = i + keepDelimiter;
         }
     }
 }
 
-void removeBranchLengthAnnotations(std::string &newick) {
-    int open_idx = -1;
-    const std::string delimiters = ",);";
-    for (size_t i = 0; i < newick.size(); ++i) {
-        if (delimiters.find(newick[i]) != std::string::npos && open_idx != -1) {
-            newick.erase(open_idx, i - open_idx);
-            i -= i - open_idx;
-            open_idx = -1;
-        }
-        if (newick[i] == ':') {
-            open_idx = i;
-        }
-    }
+void removeParentLabels(std::string &newick) {
+    const char parentDelimiter = ')';
+    removeAnnotations(newick, parentDelimiter, 1);
+}
+
+void removeBranchAnnotations(std::string &newick) {
+    const char branchDelimiter = ':';
+    removeAnnotations(newick, branchDelimiter, 0);
 }
 
 Converter toIntNewick(std::string_view strNewick) {
+    // Converter = 2 elements: mapping and intNewick
     Converter result;
 
-    int open_idx = -1;
+    int openIdx = -1;
     for (size_t i = 0; i < strNewick.size(); ++i) {
+        char c = strNewick[i];
         // char is an end delimiter
-        if (endDelimiters.find(strNewick[i]) != std::string::npos &&
-            open_idx != -1) {
+        if (endDelimiters.find(c) != std::string::npos && openIdx != -1) {
 
-            // substring between start and end delimiter
-            std::string_view subnewick =
-                strNewick.substr(open_idx, i - open_idx);
+            // substring between start and end delimiter (= a taxon)
+            std::string_view taxon = strNewick.substr(openIdx, i - openIdx);
 
-            // Add the next int to the int Newick
+            // Add the taxon to the mapping
+            result.mapping.push_back(taxon);
+
+            // Instead of a taxon, add the next int to the int Newick
             result.intNewick += std::to_string(result.mapping.size());
 
-            // Fill mapping
-            result.mapping.push_back(subnewick);
-
             // Reset
-            open_idx = -1;
+            openIdx = -1;
         }
-        // current char is a start delimiter
-        if (startDelimiters.find(strNewick[i]) != std::string::npos) {
-            open_idx = i + 1;
-            // Add to the int newick
-            result.intNewick += strNewick[i];
+        // current char is a start delimiter --> add to the int newick
+        if (startDelimiters.find(c) != std::string::npos) {
+            openIdx = i + 1;
+            result.intNewick += c;
         }
 
         // open_idx == -1 --> frame is not open --> add the current char
-        if (open_idx == -1) {
-            result.intNewick += strNewick[i];
+        if (openIdx == -1) {
+            result.intNewick += c;
         }
     }
 
@@ -69,35 +71,35 @@ Converter toIntNewick(std::string_view strNewick) {
 }
 
 std::string toStringNewick(Converter converter) {
+    // Output
     std::string strNewick;
 
-    int open_idx = -1;
+    int openIdx = -1;
 
-    size_t j = 0;
+    // Number of leaves/taxa added
+    size_t added = 0;
 
     for (size_t i = 0; i < converter.intNewick.size(); ++i) {
+        char c = converter.intNewick[i];
         // char is an end delimiter
-        if (endDelimiters.find(converter.intNewick[i]) != std::string::npos &&
-            open_idx != -1) {
+        if (endDelimiters.find(c) != std::string::npos && openIdx != -1) {
 
-            // Add the next int to the int Newick
-            strNewick += converter.mapping[j];
-
-            ++j;
+            // Add the next string to the string Newick
+            strNewick += converter.mapping[added];
+            ++added;
 
             // Reset
-            open_idx = -1;
+            openIdx = -1;
         }
-        // current char is a start delimiter
-        if (startDelimiters.find(converter.intNewick[i]) != std::string::npos) {
-            open_idx = i + 1;
-            // Add to the int newick
-            strNewick += converter.intNewick[i];
+        // current char is a start delimiter --> add to the int newick
+        if (startDelimiters.find(c) != std::string::npos) {
+            openIdx = i + 1;
+            strNewick += c;
         }
 
         // open_idx == -1 --> frame is not open --> add the current char
-        if (open_idx == -1) {
-            strNewick += converter.intNewick[i];
+        if (openIdx == -1) {
+            strNewick += c;
         }
     }
 
