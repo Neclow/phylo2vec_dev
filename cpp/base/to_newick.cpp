@@ -1,8 +1,9 @@
 #include "to_newick.hpp"
+#include <sstream>
 
 Ancestry getAncestry(const PhyloVec &v) {
     // numLeaves - 1
-    size_t k = v.size();
+    const size_t k = v.size();
 
     // Matrix with 3 columns: child1, child2, parent
     Ancestry ancestry(k);
@@ -13,11 +14,11 @@ Ancestry getAncestry(const PhyloVec &v) {
     // The first pair of leaves if always (0, 1)
     pairs.push_back({0, 1});
 
-    // The nextLeaf to add is always 2
-    unsigned int nextLeaf = 2;
-
     // The goal here is to add mergers like in the previous iteration
     for (std::size_t i = 1; i < k; ++i) {
+        // The nextLeaf to add is i + 1
+        unsigned int nextLeaf = i + 1;
+
         if (v[i] <= i) {
             /*
             If v[i] <= i, it's like a birth-death process
@@ -43,52 +44,24 @@ Ancestry getAncestry(const PhyloVec &v) {
             pairs.insert(pairs.begin() + v[i] - i,
                          {pairs[v[i] - i - 1][0], nextLeaf});
         }
-
-        // Increment nextLeaf
-        ++nextLeaf;
     }
 
     // Keep track of the following relationship: child->highest parent
     std::vector<int> parents(k * 2 + 1, -1);
-    // Keep track of siblings (i.e., sister nodes)
-    // std::vector<int> siblings(v.size() * 2 + 1, -1);
-
-    // next parent
-    int nextParent = k + 1;
-    int parentOfChild1, parentofChild2;
-
-    // int siblingOfChild1, siblingofChild2;
 
     for (std::size_t i = 0; i < k; ++i) {
         auto &[c1, c2] = pairs[i];
 
-        parentOfChild1 = parents[c1] != -1 ? parents[c1] : c1;
-        parentofChild2 = parents[c2] != -1 ? parents[c2] : c2;
+        int parentOfChild1 = parents[c1] != -1 ? parents[c1] : c1;
+        int parentofChild2 = parents[c2] != -1 ? parents[c2] : c2;
 
+        // Next parent
+        int nextParent = k + i + 1;
         ancestry[i] = {parentOfChild1, parentofChild2, nextParent};
 
         // Change the parents of the current children
         parents[c1] = nextParent;
         parents[c2] = nextParent;
-
-        // TODO: this whole block seems irrelevant? All tests pass without it
-
-        // siblingOfChild1 = siblings[c1] != -1 ? siblings[c1] : c1;
-        // siblingofChild2 = siblings[c2] != -1 ? siblings[c2] : c2;
-
-        // // Change the parents of the siblings
-        // parents[siblingOfChild1] = nextParent;
-        // parents[siblingofChild2] = nextParent;
-
-        // // Change the previous parents of the child if there are any
-        // parents[parentOfChild1] = nextParent;
-        // parents[parentofChild2] = nextParent;
-
-        // // Update siblings
-        // siblings[c1] = c2;
-        // siblings[c2] = c1;
-
-        ++nextParent;
     }
 
     return ancestry;
@@ -104,13 +77,15 @@ std::string buildNewick(const Ancestry &ancestry) {
     std::string pStr = std::to_string(p);
 
     // Initial Newick: (c1, c2)p;
-    std::string newick = "(" + c1Str + "," + c2Str + ")" + pStr + ";";
+    std::string newick = "(" + std::to_string(c1) + "," + std::to_string(c2) +
+                         ")" + std::to_string(p) + ";";
 
     // Max leaf number
-    int leafMax = ancestry.size();
+    const int leafMax = ancestry.size();
 
     // Queue of internal nodes
     std::vector<int> parentQueue;
+
     // Push nodes in the queue if they are internal
     if (c1 > leafMax) {
         parentQueue.push_back(c1);
@@ -124,12 +99,9 @@ std::string buildNewick(const Ancestry &ancestry) {
     nodeIdxs[c1] = 1;
     nodeIdxs[c2] = 2 + c1Str.length();
 
-    // Next parental node to handle
-    int nextParent;
-
     for (int i = 1; i < leafMax; ++i) {
         // Get the next internal node and pop it from the queue
-        nextParent = parentQueue.back();
+        int nextParent = parentQueue.back();
         parentQueue.pop_back();
 
         // Get the row corresponding to the nextParent
@@ -137,9 +109,8 @@ std::string buildNewick(const Ancestry &ancestry) {
         auto &[c1, c2, p] = ancestry[nextParent - leafMax - 1];
 
         // Convert the ints to strings
-        c1Str = std::to_string(c1);
-        c2Str = std::to_string(c2);
-        pStr = std::to_string(p);
+        std::string c1Str = std::to_string(c1);
+        std::string c2Str = std::to_string(c2);
 
         // Insert a sub-newick (c1, c2) where the parent is
         // Bef insert: old newick = (0,7)8; c1 = 6, c2 = 2, p = 7

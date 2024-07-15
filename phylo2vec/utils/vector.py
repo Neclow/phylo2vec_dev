@@ -262,8 +262,6 @@ def remove_leaf(v, leaf):
     # get the triplets from v
     ancestry = _get_ancestry(v)
 
-    print(ancestry)
-
     # Find the first rows and columns containg the leaf to remove
     r, c = _find_indices_of_first_leaf(ancestry, leaf)
 
@@ -291,7 +289,6 @@ def remove_leaf(v, leaf):
                 if ancestry_sub[row, col] >= parent:
                     ancestry_sub[row, col] -= 1
 
-    print(ancestry_sub)
     # We now have a correct ancestry without "leaf"
     # So we build a vector from it
 

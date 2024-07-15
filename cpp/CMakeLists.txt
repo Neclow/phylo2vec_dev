@@ -14,9 +14,16 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
+# Include fmt using FetchContent
+# FetchContent_Declare(
+#   fmt
+#   GIT_REPOSITORY https://github.com/fmtlib/fmt
+#   GIT_TAG        e69e5f977d458f2650bb346dadf2ad30c5320281) # 10.2.1
+# FetchContent_MakeAvailable(fmt)
+
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 # Find benchmark package
 find_package(benchmark REQUIRED)

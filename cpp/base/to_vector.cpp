@@ -27,11 +27,6 @@ Ancestry getCherries(std::string_view newick) {
         if (c == ')') {
             ++i;
 
-            // Get the parent node after )
-            size_t end;
-            int p = stoi_substr(newick, i, &end);
-            i = end - 1;
-
             // Pop the children nodes from the stack
             int c2 = stack.back();
             stack.pop_back();
@@ -39,8 +34,14 @@ Ancestry getCherries(std::string_view newick) {
             int c1 = stack.back();
             stack.pop_back();
 
+            // Get the parent node after )
+            size_t end;
+            int p = stoi_substr(newick, i, &end);
+            i = end - 1;
+
             // Add the triplet (c1, c2, p)
             ancestry.push_back({c1, c2, p});
+
             // Push the parent node to the stack
             stack.push_back(p);
         } else if (c >= '0' && c <= '9') {
@@ -70,14 +71,14 @@ Ancestry getCherriesNoParents(std::string_view newick) {
             int c1 = stack.back();
             stack.pop_back();
 
-            int p = std::max(c1, c2);
+            int cMax = std::max(c1, c2);
 
-            ancestry.push_back({c1, c2, p});
+            ancestry.push_back({c1, c2, cMax});
             stack.push_back(std::min(c1, c2));
         } else if (c >= '0' && c <= '9') {
             size_t end;
-            int p = stoi_substr(newick, i, &end);
-            stack.push_back(p);
+            int node = stoi_substr(newick, i, &end);
+            stack.push_back(node);
             i = end - 1;
         }
     }
@@ -86,9 +87,9 @@ Ancestry getCherriesNoParents(std::string_view newick) {
 }
 
 void orderCherries(Ancestry &ancestry) {
-    const size_t numLeaves = ancestry.size();
+    const size_t numCherries = ancestry.size();
 
-    std::qsort(ancestry.data(), numLeaves, sizeof(std::array<int, 3>),
+    std::qsort(ancestry.data(), numCherries, sizeof(std::array<int, 3>),
                [](const void *a, const void *b) {
                    const auto &arr1 =
                        *static_cast<const std::array<int, 3> *>(a);
@@ -97,16 +98,13 @@ void orderCherries(Ancestry &ancestry) {
                    return arr1[2] - arr2[2];
                });
 
-    std::vector<int> child_min(numLeaves * 2 + 1, -1);
+    std::vector<int> child_min(numCherries * 2 + 1, -1);
 
-    int parentOfChild1;
-    int parentOfChild2;
-
-    for (size_t i = 0; i < numLeaves; ++i) {
+    for (size_t i = 0; i < numCherries; ++i) {
         auto &[c1, c2, p] = ancestry[i];
 
-        parentOfChild1 = child_min[c1] != -1 ? child_min[c1] : c1;
-        parentOfChild2 = child_min[c2] != -1 ? child_min[c2] : c2;
+        int parentOfChild1 = child_min[c1] != -1 ? child_min[c1] : c1;
+        int parentOfChild2 = child_min[c2] != -1 ? child_min[c2] : c2;
 
         child_min[p] = std::min(parentOfChild1, parentOfChild2);
 
@@ -116,10 +114,13 @@ void orderCherries(Ancestry &ancestry) {
 }
 
 void orderCherriesNoParents(Ancestry &ancestry) {
+    // numCherries = numLeaves - 1
     const int numCherries = ancestry.size();
 
-    Ancestry oldAncestry = ancestry;
+    // Copy of current ancestry
+    const Ancestry oldAncestry = ancestry;
 
+    // Index ordering for the new ancestry
     std::vector<std::uint8_t> idxs(numCherries, 0);
 
     for (int i = 0; i < numCherries; ++i) {
@@ -129,32 +130,16 @@ void orderCherriesNoParents(Ancestry &ancestry) {
         int idx;
 
         for (int j = 0; j < numCherries; ++j) {
-            auto &[c1, c2, _] = oldAncestry[j];
-
             if (idxs[j]) {
                 continue;
             }
 
+            auto &[c1, c2, _] = oldAncestry[j];
+
             if (!(d[c1] || d[c2])) {
-                bool c1_is_leaf = c1 <= numCherries;
-                bool c2_is_leaf = c2 <= numCherries;
-                if (c1_is_leaf && !(c2_is_leaf)) {
-                    if (c1 > maxLeaf) {
-                        maxLeaf = c1;
-                        idx = j;
-                    }
-                } else if (c2_is_leaf && !(c1_is_leaf)) {
-                    if (c2 > maxLeaf) {
-                        maxLeaf = c2;
-                        idx = j;
-                    }
-                } else if (c1_is_leaf && c2_is_leaf) {
-                    int cMax = std::max(c1, c2);
-                    if (cMax > maxLeaf) {
-                        maxLeaf = cMax;
-                        idx = j;
-                    }
-                } else {
+                int cMax = std::max(c1, c2);
+                if (cMax > maxLeaf) {
+                    maxLeaf = std::max(c1, c2);
                     idx = j;
                 }
             }
@@ -170,22 +155,20 @@ void orderCherriesNoParents(Ancestry &ancestry) {
 }
 
 PhyloVec buildVector(Ancestry const &cherries) {
-    const size_t numLeaves = cherries.size();
+    const size_t numCherries = cherries.size();
 
-    PhyloVec v(numLeaves);
+    PhyloVec v(numCherries);
 
-    int cMax;
-
-    int idx;
-
-    for (int i = numLeaves - 1; i >= 0; --i) {
+    for (int i = numCherries - 1; i >= 0; --i) {
         auto &[c1, c2, p] = cherries[i];
 
-        cMax = std::max(c1, c2);
+        int cMin = std::min(c1, c2);
+        int cMax = std::max(c1, c2);
 
-        idx = 0;
+        int idx = 0;
 
-        for (size_t j = 0; j < numLeaves; j++) {
+        // Find first row containing cMax
+        for (size_t j = 0; j < numCherries; j++) {
             if (cherries[j][2] <= cMax) {
                 if (cherries[j][0] == cMax || cherries[j][1] == cMax) {
                     break;
@@ -195,7 +178,7 @@ PhyloVec buildVector(Ancestry const &cherries) {
             }
         }
 
-        v[cMax - 1] = idx == 0 ? std::min(c1, c2) : cMax - 1 + idx;
+        v[cMax - 1] = idx == 0 ? cMin : cMax - 1 + idx;
     }
 
     return v;

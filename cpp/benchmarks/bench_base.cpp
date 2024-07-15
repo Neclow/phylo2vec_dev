@@ -8,6 +8,16 @@
 
 constexpr int NUM_LEAVES = 1024;
 
+// Benchmark sample
+void benchSample(PhyloVec v) { std::string newick = toNewick(v); }
+
+static void BM_sample(benchmark::State &state) {
+    int n = state.range(0);
+    for (auto _ : state) {
+        PhyloVec v = sample(n);
+    }
+}
+
 // Benchmark toNewick
 void benchToNewick(PhyloVec v) { std::string newick = toNewick(v); }
 
@@ -20,11 +30,6 @@ static void BM_toNewick(benchmark::State &state) {
         benchToNewick(v);
     }
 }
-
-BENCHMARK(BM_toNewick)
-    ->Arg(NUM_LEAVES)
-    ->Unit(benchmark::kMillisecond)
-    ->Complexity();
 
 // Benchmark toVector
 void benchToVector(std::string newick) { PhyloVec v = toVector(newick); }
@@ -39,11 +44,6 @@ static void BM_toVector(benchmark::State &state) {
         benchToVector(newick);
     }
 }
-
-BENCHMARK(BM_toVector)
-    ->Arg(NUM_LEAVES)
-    ->Unit(benchmark::kMillisecond)
-    ->Complexity();
 
 // Benchmark toVectorNoParents
 void benchToVectorNoParents(std::string newick) {
@@ -61,6 +61,21 @@ static void BM_toVectorNoParents(benchmark::State &state) {
         benchToVectorNoParents(newick);
     }
 }
+
+BENCHMARK(BM_sample)
+    ->Arg(NUM_LEAVES)
+    ->Unit(benchmark::kMillisecond)
+    ->Complexity();
+
+BENCHMARK(BM_toNewick)
+    ->Arg(NUM_LEAVES)
+    ->Unit(benchmark::kMillisecond)
+    ->Complexity();
+
+BENCHMARK(BM_toVector)
+    ->Arg(NUM_LEAVES)
+    ->Unit(benchmark::kMillisecond)
+    ->Complexity();
 
 BENCHMARK(BM_toVectorNoParents)
     ->Arg(NUM_LEAVES)

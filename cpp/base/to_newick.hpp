@@ -6,10 +6,6 @@
  * @brief Vector-to-Newick conversion functions
  */
 
-#include <array>
-#include <string>
-#include <vector>
-
 #include "core.hpp"
 
 /**
