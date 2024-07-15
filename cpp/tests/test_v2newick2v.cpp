@@ -6,8 +6,6 @@
 
 #include <gtest/gtest.h>
 
-#include <vector>
-
 class V2Newick2VTest : public ::testing::TestWithParam<int> {
   protected:
 };

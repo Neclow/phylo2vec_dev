@@ -15,7 +15,7 @@ Ancestry getAncestry(const PhyloVec &v) {
     pairs.push_back({0, 1});
 
     // The goal here is to add mergers like in the previous iteration
-    for (std::size_t i = 1; i < k; ++i) {
+    for (size_t i = 1; i < k; ++i) {
         // The nextLeaf to add is i + 1
         unsigned int nextLeaf = i + 1;
 
@@ -49,7 +49,7 @@ Ancestry getAncestry(const PhyloVec &v) {
     // Keep track of the following relationship: child->highest parent
     std::vector<int> parents(k * 2 + 1, -1);
 
-    for (std::size_t i = 0; i < k; ++i) {
+    for (size_t i = 0; i < k; ++i) {
         auto &[c1, c2] = pairs[i];
 
         int parentOfChild1 = parents[c1] != -1 ? parents[c1] : c1;
@@ -77,8 +77,7 @@ std::string buildNewick(const Ancestry &ancestry) {
     std::string pStr = std::to_string(p);
 
     // Initial Newick: (c1, c2)p;
-    std::string newick = "(" + std::to_string(c1) + "," + std::to_string(c2) +
-                         ")" + std::to_string(p) + ";";
+    std::string newick = "(" + c1Str + "," + c2Str + ")" + pStr + ";";
 
     // Max leaf number
     const int leafMax = ancestry.size();
@@ -105,12 +104,12 @@ std::string buildNewick(const Ancestry &ancestry) {
         parentQueue.pop_back();
 
         // Get the row corresponding to the nextParent
-        // TODO: I think p == nextParent
+        // Note that p == nextParent
         auto &[c1, c2, p] = ancestry[nextParent - leafMax - 1];
 
         // Convert the ints to strings
-        std::string c1Str = std::to_string(c1);
-        std::string c2Str = std::to_string(c2);
+        c1Str = std::to_string(c1);
+        c2Str = std::to_string(c2);
 
         // Insert a sub-newick (c1, c2) where the parent is
         // Bef insert: old newick = (0,7)8; c1 = 6, c2 = 2, p = 7

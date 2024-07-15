@@ -6,8 +6,8 @@
 void check_v(const PhyloVec &v) {
     // check that v is valid: 0 <= v[i] <= 2i
 
-    const std::size_t k = v.size();
-    for (std::size_t i = 0; i < k; ++i) {
+    const size_t k = v.size();
+    for (size_t i = 0; i < k; ++i) {
         if (v[i] > 2 * i) {
             std::ostringstream oss;
             oss << "Invalid value at index " << i

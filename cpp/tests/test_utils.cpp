@@ -6,7 +6,6 @@
 #include <gtest/gtest.h>
 
 #include <random>
-#include <vector>
 
 class UtilsTest : public ::testing::TestWithParam<int> {
   protected:

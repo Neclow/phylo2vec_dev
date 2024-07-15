@@ -16,7 +16,7 @@ to_newick(v)
 ## C++ example
 
 ```bash
-# Modify cpp/benchmarks/bench.cpp accordingly
+# Modify cpp/benchmarks/bench_base.cpp accordingly
 cd cpp
 mkdir build
 cd build
@@ -29,11 +29,13 @@ make
 
 Approx. execution times (ms)
 
-|                      | size | cpp  | python |
-|----------------------|------|------|--------|
-| to_newick            | 512  | 0.17 | 0.4    |
-| to_newick            | 1024 | 0.4  | 0.85   |
-| to_vector            | 512  | 0.7  | 2.5    |
-| to_vector            | 1024 | 2.5  | 6.5    |
-| to_vector_no_parents | 512  | 3.2  | 3      |
-| to_vector_no_parents | 1024 | 12.5 | 8.9    |
+|                      | size | cpp   | python |
+|----------------------|------|------ |--------|
+| sample               | 512  | 0.033 |        |
+| sample               | 1024 | 0.059 |        |
+| to_newick            | 512  | 0.17  | 0.4    |
+| to_newick            | 1024 | 0.4   | 0.85   |
+| to_vector            | 512  | 0.7   | 2.5    |
+| to_vector            | 1024 | 2.5   | 6.5    |
+| to_vector_no_parents | 512  | 3.2   | 3      |
+| to_vector_no_parents | 1024 | 12.5  | 8.9    |
