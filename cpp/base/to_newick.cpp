@@ -48,7 +48,7 @@ Ancestry getAncestry(const PhyloVec &v) {
     }
 
     // Keep track of the following relationship: child->highest parent
-    std::vector<int> parents(k * 2 + 1, -1);
+    std::vector<int> parents(2 * k + 1, -1);
 
     for (size_t i = 0; i < k; ++i) {
         auto &[c1, c2] = pairs[i];

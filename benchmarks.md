@@ -44,13 +44,13 @@ using BenchmarkTools
 
 Approx. execution times (ms)
 
-|                      | size | cpp   | python | julia |
-|----------------------|------|------ |--------|-------|
-| sample               | 512  | 0.01  |        | 0.003 |
-| sample               | 1024 | 0.02  |        | 0.006 |
-| to_newick            | 512  | 0.15  | 0.4    | 0.29  |
-| to_newick            | 1024 | 0.33  | 0.85   | 0.69  |
-| to_vector            | 512  | 0.68  | 2.5    |       |
-| to_vector            | 1024 | 2.35  | 6.5    |       |
-| to_vector_no_parents | 512  | 2.86  | 3      |       |
-| to_vector_no_parents | 1024 | 11.0  | 8.9    |       |
+|                      | size | cpp   | python | julia | winner |
+|----------------------|------|------ |--------|-------|--------|
+| sample               | 512  | 0.009 | 0.009  | 0.003 | julia  |
+| sample               | 1024 | 0.018 | 0.013  | 0.006 | julia  |
+| to_newick            | 512  | 0.18  | 0.39   | 0.24  | cpp    |
+| to_newick            | 1024 | 0.38  | 0.85   | 0.64  | cpp    |
+| to_vector            | 512  | 0.65  | 2.5    |       | cpp    |
+| to_vector            | 1024 | 2.3   | 6.5    |       | cpp    |
+| to_vector_no_parents | 512  | 2.66  | 3      |       | cpp    |
+| to_vector_no_parents | 1024 | 10.3  | 8.9    |       | python |
