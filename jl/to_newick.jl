@@ -1,22 +1,8 @@
-"Get length of digit `d` if represented as a string."
-digitlen(d) = ceil(Int, log10(d + 1)) + (d == 0)
-
-"""
-    sample_v(nleaves; ordered=false)
-
-Sample a random tree via Phylo2Vec
-"""
-function sample_v(nleaves; ordered=false)
-    if ordered
-        [rand(0:i) for i in 0:nleaves-2]
-    else
-        [rand(0:2i) for i in 0:nleaves-2]
-    end
-end
+include("base.jl")
 
 """
     get_ancestry(v)
-
+    
 Get the "ancestry" of v (see "Returns" paragraph)
 
 v[i] = which BRANCH we do the pairing from
@@ -34,21 +20,8 @@ v[1] = 0 or 1 indicates that we branch out from branch 0 or 1, respectively.
 The new branch yields leaf 2 (like in ordered trees)
 
 v[1] = 2 is somewhat similar: we create a new branch from R that yields leaf 2
-
-Parameters
-----------
-`v`: Vector{Int}
-    Phylo2Vec vector
-
-Returns
--------
-`ancestry` : Matrix{Int}
-    Ancestry matrix
-    1st column: child 1
-    2nd column: child 2
-    3rd column: parent node
 """
-function get_ancestry(v)
+function _vector_to_ancestry(v)
     pairs = [(0, 1)]
 
     for i in 2:length(v)
@@ -83,11 +56,37 @@ function get_ancestry(v)
     ancestry
 end
 
-"Get length of digit `d` if represented as a string."
-digitlen(d) = ceil(Int, log10(d + 1)) + (d == 0)
+
+"Build newick tree from `ancestry` with recursion."
+function _build_newick(ancestry)
+    nmax = size(ancestry, 1)
+
+    function build_newick_inner(p::Int)::String
+        c1, c2 = @view ancestry[p-nmax, 1:2]
+
+        left = c1 > nmax ? build_newick_inner(c1) : string(c1)
+        right = c2 > nmax ? build_newick_inner(c2) : string(c2)
+
+        return string("(", left, ",", right, ")", p)
+    end
+
+    build_newick_inner(ancestry[end, end]) * ";"
+end
+
+"Convert vector `v` to Newick representation."
+function to_newick(v)
+    ancestry = _vector_to_ancestry(v)
+    _build_newick(ancestry)
+end
+
+
+
+
+
+
 
 "Build newick tree from `ancestry` without recursion."
-function build_newick(ancestry)
+function _build_newick_old(ancestry)
     c1, c2, p = ancestry[end, :]
 
     newick = "($c1,$c2)$p;"
@@ -122,28 +121,7 @@ function build_newick(ancestry)
     newick
 end
 
-"Build newick tree from `ancestry` with recursion."
-function build_newick_recursive(ancestry)
-    nmax = size(ancestry, 1)
-
-    function build_newick_inner(p::Int)::String
-        c1, c2 = @view ancestry[p-nmax, 1:2]
-
-        left = c1 > nmax ? build_newick_inner(c1) : string(c1)
-        right = c2 > nmax ? build_newick_inner(c2) : string(c2)
-
-        return string("(", left, ",", right, ")", p)
-    end
-
-    build_newick_inner(ancestry[end, end]) * ";"
-end
-
-function to_newick(v)
-    ancestry = get_ancestry(v)
-    build_newick(ancestry)
-end
-
-function to_newick_recursive(v)
-    ancestry = get_ancestry(v)
-    build_newick_recursive(ancestry)
+function to_newick_old(v)
+    ancestry = _vector_to_ancestry(v)
+    _build_newick_old(ancestry)
 end
