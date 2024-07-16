@@ -58,6 +58,7 @@ void addLeaf(PhyloVec &v, const unsigned int &leaf, const unsigned int &pos) {
 
 unsigned int removeLeaf(PhyloVec &v, const unsigned int &leaf) {
     Ancestry ancestry = getAncestry(v);
+
     std::pair<size_t, size_t> leafCoords =
         findCoordsOfFirstLeaf(ancestry, leaf);
 
@@ -83,7 +84,7 @@ unsigned int removeLeaf(PhyloVec &v, const unsigned int &leaf) {
                 node = sister;
             }
 
-            // Subtract 1 from the leafs larger > "leaf"
+            // Subtract 1 for leaves > "leaf"
             // (so that the vector is still valid)
             if (node > leaf) {
                 node -= 1;
@@ -97,7 +98,7 @@ unsigned int removeLeaf(PhyloVec &v, const unsigned int &leaf) {
         }
     }
 
-    // We now have a correct ancestry without "leaf"
+    // We now have a valid ancestry without "leaf"
     // So we build a vector from it
 
     orderCherries(ancestryRm);

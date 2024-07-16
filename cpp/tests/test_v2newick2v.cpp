@@ -15,7 +15,7 @@ INSTANTIATE_TEST_SUITE_P(RandomTests, V2Newick2VTest,
 
 TEST_P(V2Newick2VTest, V2Newick2V) {
     int numLeaves = GetParam();
-    for (size_t _ = 0; _ < N_REPEATS; _++) {
+    for (size_t _ = 0; _ < N_REPEATS; ++_) {
         PhyloVec v = sample(numLeaves, false);
         std::string newick = toNewick(v);
 

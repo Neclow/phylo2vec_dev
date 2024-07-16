@@ -5,6 +5,10 @@ project(phylo2vec)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+
 # Include Google Test using FetchContent
 include(FetchContent)
 FetchContent_Declare(
@@ -14,19 +18,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
+# Find benchmark package
+find_package(benchmark REQUIRED)
+
 # Include fmt using FetchContent
 # FetchContent_Declare(
 #   fmt
 #   GIT_REPOSITORY https://github.com/fmtlib/fmt
 #   GIT_TAG        e69e5f977d458f2650bb346dadf2ad30c5320281) # 10.2.1
 # FetchContent_MakeAvailable(fmt)
-
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2")
-
-# Find benchmark package
-find_package(benchmark REQUIRED)
 
 # Source files
 set(SOURCES
@@ -45,12 +45,15 @@ set(TEST_SOURCES
 )
 
 # Main library
-add_library(phylo2vec ${SOURCES})
+add_library(phylo2vec_cpp SHARED ${SOURCES})
+
+# Add git submodules
+add_subdirectory(extern)
 
 # Main executable
 add_executable(phylo2vec_main main.cpp ${SOURCES})
 
-target_link_libraries(phylo2vec_main phylo2vec)
+target_link_libraries(phylo2vec_main phylo2vec_cpp)
 
 # Test executable
 add_executable(phylo2vec_test ${TEST_SOURCES} ${SOURCES})

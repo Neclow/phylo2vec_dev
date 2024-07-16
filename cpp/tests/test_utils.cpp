@@ -16,7 +16,7 @@ INSTANTIATE_TEST_SUITE_P(RandomTests, UtilsTest,
 
 TEST_P(UtilsTest, SampleTest) {
     int numLeaves = GetParam();
-    for (size_t _ = 0; _ < N_REPEATS; _++) {
+    for (size_t _ = 0; _ < N_REPEATS; ++_) {
         PhyloVec v = sample(numLeaves, false);
 
         EXPECT_NO_THROW(check_v(v));
@@ -27,7 +27,7 @@ TEST_P(UtilsTest, RemoveAndAddTest) {
     int numLeaves = GetParam();
     std::random_device rd;
     std::mt19937 gen(rd());
-    for (size_t _ = 0; _ < N_REPEATS; _++) {
+    for (size_t _ = 0; _ < N_REPEATS; ++_) {
         PhyloVec v = sample(numLeaves, false);
 
         PhyloVec vOld = v;

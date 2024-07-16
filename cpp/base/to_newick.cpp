@@ -1,5 +1,4 @@
 #include "to_newick.hpp"
-#include <sstream>
 
 Ancestry getAncestry(const PhyloVec &v) {
     // numLeaves - 1

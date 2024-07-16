@@ -43,9 +43,10 @@ Ancestry getCherries(std::string_view newick) {
             ancestry.push_back({c1, c2, p});
 
             // Push the parent node to the stack
+            // c1 = p;
             stack.push_back(p);
         } else if (c >= '0' && c <= '9') {
-            // Get the next node and push it the stack
+            // Get the next node and push it to the stack
             size_t end;
             int node = stoi_substr(newick, i, &end);
             stack.push_back(node);
@@ -58,6 +59,7 @@ Ancestry getCherries(std::string_view newick) {
 
 Ancestry getCherriesNoParents(std::string_view newick) {
     Ancestry ancestry;
+    ancestry.reserve(newick.length());
 
     std::vector<int> stack;
 
@@ -78,12 +80,13 @@ Ancestry getCherriesNoParents(std::string_view newick) {
 
             // Push the min leaf to the stack
             int cMin = std::min(c1, c2);
+            // c1 = cMin;
             stack.push_back(cMin);
         } else if (c >= '0' && c <= '9') {
-            // Get the next node and push it the stack
+            // Get the next leaf and push it to the stack
             size_t end;
-            int node = stoi_substr(newick, i, &end);
-            stack.push_back(node);
+            int leaf = stoi_substr(newick, i, &end);
+            stack.push_back(leaf);
             i = end - 1;
         }
     }
@@ -167,7 +170,7 @@ void orderCherriesNoParents(Ancestry &ancestry) {
                 if (cMax > maxLeaf) {
                     // If yes again, update maxLeaf
                     maxLeaf = cMax;
-                    // index to swap = j
+                    // index to swap <-- j
                     idx = j;
                 }
             }
@@ -185,13 +188,14 @@ void orderCherriesNoParents(Ancestry &ancestry) {
     }
 }
 
-PhyloVec buildVector(Ancestry const &cherries) {
+PhyloVec buildVector(const Ancestry &cherries) {
     const size_t numCherries = cherries.size();
 
     PhyloVec v(numCherries);
 
     // Start from bottom to top
     // Note: v[0] is always 0
+    // but starting with i = numCherries - 2 makes some tests fail (weird)
     for (int i = numCherries - 1; i >= 0; --i) {
         auto &[c1, c2, _] = cherries[i];
 
@@ -200,7 +204,7 @@ PhyloVec buildVector(Ancestry const &cherries) {
 
         int idx = 0;
 
-        for (size_t j = 0; j < numCherries; j++) {
+        for (size_t j = 0; j < numCherries; ++j) {
             if (cherries[j][2] <= cMax) {
                 if (cherries[j][0] == cMax || cherries[j][1] == cMax) {
                     break;

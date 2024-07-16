@@ -31,7 +31,7 @@ end
 
 """
     get_ancestry(v)
-    
+
 Get the "ancestry" of v (see "Returns" paragraph)
 
 v[i] = which BRANCH we do the pairing from

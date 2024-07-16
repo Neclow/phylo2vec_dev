@@ -95,10 +95,10 @@ def _order_cherries_no_parents(cherries):
         max_leaf = -1
 
         for j, ch in enumerate(old_cherries):
-            c1, c2, _ = ch
-
             if idxs[j] == 1:
                 continue
+
+            c1, c2, _ = ch
 
             if not (d[c1] == 1 or d[c2] == 1):
                 if c1 <= n_cherries and c2 > n_cherries:
@@ -120,7 +120,7 @@ def _order_cherries_no_parents(cherries):
             d[c1] = 1
             d[c2] = 1
 
-        idxs[idx] = 1  # idx
+        idxs[idx] = 1
 
         cherries[i] = old_cherries[idx]
 
