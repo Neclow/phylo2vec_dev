@@ -32,6 +32,7 @@ find_package(benchmark REQUIRED)
 set(SOURCES
     base/to_newick.cpp
     base/to_vector.cpp
+    matrix/to_newick.cpp
     utils/random.cpp
     utils/validation.cpp
     utils/newick.cpp

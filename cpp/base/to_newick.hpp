@@ -28,7 +28,7 @@ Ancestry getAncestry(const PhyloVec &v);
  * @param ancestry "Ancestry" array of size (n_leaves - 1, 3)
  * @return std::string Newick string
  */
-std::string buildNewick(const Ancestry &ancestry);
+std::string buildNewickRecursive(const Ancestry &ancestry);
 
 /**
  * @brief Wrapper of getAncestry and buildNewick

@@ -48,9 +48,9 @@ Approx. execution times (ms)
 |----------------------|------|------ |--------|-------|
 | sample               | 512  | 0.01  |        | 0.003 |
 | sample               | 1024 | 0.02  |        | 0.006 |
-| to_newick            | 512  | 0.17  | 0.4    | 0.29  |
-| to_newick            | 1024 | 0.4   | 0.85   | 0.69  |
-| to_vector            | 512  | 0.7   | 2.5    |       |
-| to_vector            | 1024 | 2.5   | 6.5    |       |
-| to_vector_no_parents | 512  | 3.2   | 3      |       |
-| to_vector_no_parents | 1024 | 12.5  | 8.9    |       |
+| to_newick            | 512  | 0.15  | 0.4    | 0.29  |
+| to_newick            | 1024 | 0.33  | 0.85   | 0.69  |
+| to_vector            | 512  | 0.68  | 2.5    |       |
+| to_vector            | 1024 | 2.35  | 6.5    |       |
+| to_vector_no_parents | 512  | 2.86  | 3      |       |
+| to_vector_no_parents | 1024 | 11.0  | 8.9    |       |
