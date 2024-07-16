@@ -69,16 +69,15 @@ Ancestry getAncestry(const PhyloVec &v) {
 }
 
 static std::string buildNewickRecursiveInner(const int &p,
-                                             const Ancestry &ancestry,
-                                             const int &leafMax) {
+                                             const Ancestry &ancestry) {
+    const int leafMax = ancestry.size();
+
     auto &[c1, c2, _] = ancestry[p - leafMax - 1];
 
-    std::string left = c1 > leafMax
-                           ? buildNewickRecursiveInner(c1, ancestry, leafMax)
-                           : std::to_string(c1);
-    std::string right = c2 > leafMax
-                            ? buildNewickRecursiveInner(c2, ancestry, leafMax)
-                            : std::to_string(c2);
+    std::string left = c1 > leafMax ? buildNewickRecursiveInner(c1, ancestry)
+                                    : std::to_string(c1);
+    std::string right = c2 > leafMax ? buildNewickRecursiveInner(c2, ancestry)
+                                     : std::to_string(c2);
 
     std::string newick = "(" + left + "," + right + ")" + std::to_string(p);
 
@@ -86,11 +85,9 @@ static std::string buildNewickRecursiveInner(const int &p,
 }
 
 std::string buildNewickRecursive(const Ancestry &ancestry) {
-    const int leafMax = ancestry.size();
-
     const int root = ancestry.back()[2];
 
-    return buildNewickRecursiveInner(root, ancestry, leafMax) + ";";
+    return buildNewickRecursiveInner(root, ancestry) + ";";
 }
 
 std::string toNewick(const PhyloVec &v) {
