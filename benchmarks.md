@@ -33,11 +33,11 @@ include("jl/base.jl")
 # Sample a 1024-leaf tree
 v = sample_v(1024)
 # Compile
-to_newick_recursive(v)
+to_newick(v)
 
 # Benchmark performance
 using BenchmarkTools
-@benchmark to_newick_recursive(v) setup=(v=$v)
+@benchmark to_newick(v) setup=(v=$v)
 ```
 
 ## Summary table
@@ -50,7 +50,7 @@ Approx. execution times (ms)
 | sample               | 1024 | 0.015 | 0.013  | 0.006 | julia  |
 | to_newick            | 512  | 0.18  | 0.39   | 0.24  | cpp    |
 | to_newick            | 1024 | 0.38  | 0.85   | 0.64  | cpp    |
-| to_vector            | 512  | 0.65  | 2.5    |       | cpp    |
-| to_vector            | 1024 | 2.2   | 6.5    |       | cpp    |
+| to_vector            | 512  | 0.65  | 2.5    | 0.4   | julia  |
+| to_vector            | 1024 | 2.2   | 6.5    | 1.5   | julia  |
 | to_vector_no_parents | 512  | 2.66  | 3      |       | cpp    |
 | to_vector_no_parents | 1024 | 9.7   | 8.9    |       | python |
