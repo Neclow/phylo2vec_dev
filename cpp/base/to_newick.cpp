@@ -1,7 +1,5 @@
 #include "to_newick.hpp"
 
-#include <iostream>
-
 Ancestry getAncestry(const PhyloVec &v) {
     // numLeaves - 1
     const size_t k = v.size();
@@ -68,8 +66,7 @@ Ancestry getAncestry(const PhyloVec &v) {
     return ancestry;
 }
 
-static std::string buildNewickRecursiveInner(const int &p,
-                                             const Ancestry &ancestry) {
+static std::string buildNewickRecursiveInner(int p, const Ancestry &ancestry) {
     const int leafMax = ancestry.size();
 
     auto &[c1, c2, _] = ancestry[p - leafMax - 1];
@@ -84,12 +81,10 @@ static std::string buildNewickRecursiveInner(const int &p,
     return newick;
 }
 
-std::string buildNewickRecursive(const Ancestry &ancestry) {
+std::string buildNewick(const Ancestry &ancestry) {
     const int root = ancestry.back()[2];
 
     return buildNewickRecursiveInner(root, ancestry) + ";";
 }
 
-std::string toNewick(const PhyloVec &v) {
-    return buildNewickRecursive(getAncestry(v));
-}
+std::string toNewick(const PhyloVec &v) { return buildNewick(getAncestry(v)); }

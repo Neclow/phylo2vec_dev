@@ -188,34 +188,28 @@ void orderCherriesNoParents(Ancestry &ancestry) {
     }
 }
 
-PhyloVec buildVector(const Ancestry &cherries) {
+PhyloVec buildVector(Ancestry cherries) {
     const size_t numCherries = cherries.size();
 
-    PhyloVec v(numCherries);
+    PhyloVec v(numCherries, 0);
 
-    // Start from bottom to top
     // Note: v[0] is always 0
-    // but starting with i = numCherries - 2 makes some tests fail (weird)
-    for (int i = numCherries - 1; i >= 0; --i) {
-        auto &[c1, c2, _] = cherries[i];
+    // but starting with i = 1 makes some tests fail (weird)
 
-        int cMin = std::min(c1, c2);
-        int cMax = std::max(c1, c2);
+    for (size_t i = 0; i < numCherries; ++i) {
+        auto &[c1, c2, cMax] = cherries[i];
 
         int idx = 0;
 
-        for (size_t j = 0; j < numCherries; ++j) {
+        for (int j = i - 1; j >= 0; --j) {
             if (cherries[j][2] <= cMax) {
-                if (cherries[j][0] == cMax || cherries[j][1] == cMax) {
-                    break;
-                } else {
-                    ++idx;
-                }
+                ++idx;
+            } else {
+                break;
             }
         }
 
-        // Reminder: v[i] = j --> branch i yields leaf j
-        v[cMax - 1] = idx == 0 ? cMin : cMax - 1 + idx;
+        v[cMax - 1] = idx == 0 ? std::min(c1, c2) : cMax - 1 + idx;
     }
 
     return v;

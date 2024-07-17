@@ -4,7 +4,7 @@
 #include "../base/to_vector.hpp"
 
 std::pair<size_t, size_t> findCoordsOfFirstLeaf(const Ancestry &ancestry,
-                                                const int &leaf) {
+                                                int leaf) {
     std::pair<size_t, size_t> coords;
     for (size_t r = 0; r < ancestry.size(); ++r) {
         for (size_t c = 0; c < 3; ++c) {
@@ -18,7 +18,7 @@ std::pair<size_t, size_t> findCoordsOfFirstLeaf(const Ancestry &ancestry,
     return coords;
 }
 
-void addLeaf(PhyloVec &v, const unsigned int &leaf, const unsigned int &pos) {
+void addLeaf(PhyloVec &v, unsigned int leaf, unsigned int pos) {
     // Append a new leaf branching out from "pos"
     v.push_back(pos);
 
@@ -56,7 +56,7 @@ void addLeaf(PhyloVec &v, const unsigned int &leaf, const unsigned int &pos) {
     v = buildVector(ancestryAdd);
 }
 
-unsigned int removeLeaf(PhyloVec &v, const unsigned int &leaf) {
+unsigned int removeLeaf(PhyloVec &v, unsigned int leaf) {
     Ancestry ancestry = getAncestry(v);
 
     std::pair<size_t, size_t> leafCoords =

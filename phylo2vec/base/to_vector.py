@@ -130,14 +130,14 @@ def _order_cherries_no_parents(cherries):
 @nb.njit(cache=True)
 def _build_vector(cherries):
     v_res = np.zeros((cherries.shape[0],), dtype=np.uint16)
-    for i in range(cherries.shape[0] - 1, -1, -1):
-        c1, c2, _ = cherries[i]
+    for i in range(cherries.shape[0]):
+        c1, c2, c_max = cherries[i]
 
-        c_max = max(c1, c2)
+        idx = 0
 
-        subset = cherries[cherries[:, -1] <= c_max][:, :-1]
-
-        idx = np.where(subset == c_max)[0][0]
+        for j in range(i):
+            if cherries[j][-1] <= c_max:
+                idx += 1
 
         if idx == 0:
             v_res[c_max - 1] = min(c1, c2)

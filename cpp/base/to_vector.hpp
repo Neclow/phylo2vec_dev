@@ -127,7 +127,7 @@ void orderCherriesNoParents(Ancestry &ancestry);
  * child2)}
  * @return PhyloVec: v[i] = j <=> leaf j descends from branch i
  */
-PhyloVec buildVector(const Ancestry &cherries);
+PhyloVec buildVector(Ancestry cherries);
 
 /**
  * @brief Convert a newick (with parent annotations) to a Phylo2Vec vector
