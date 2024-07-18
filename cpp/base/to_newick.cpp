@@ -87,4 +87,7 @@ std::string buildNewick(const Ancestry &ancestry) {
     return buildNewickRecursiveInner(root, ancestry) + ";";
 }
 
-std::string toNewick(const PhyloVec &v) { return buildNewick(getAncestry(v)); }
+std::string toNewick(const PhyloVec &v) {
+    Ancestry anc = getAncestry(v);
+    return buildNewick(anc);
+}

@@ -69,9 +69,10 @@ unsigned int removeLeaf(PhyloVec &v, unsigned int leaf) {
     unsigned int parent = ancestry[leafRow][2];
     unsigned int sister = ancestry[leafRow][1 - leafCol];
 
-    Ancestry ancestryRm(ancestry.size() - 1);
+    const size_t numCherries = ancestry.size();
+    Ancestry ancestryRm(numCherries - 1);
 
-    for (size_t r = 0; r < ancestry.size() - 1; ++r) {
+    for (size_t r = 0; r < numCherries - 1; ++r) {
         if (r < leafRow) {
             ancestryRm[r] = ancestry[r];
         } else {

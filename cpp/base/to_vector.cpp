@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <charconv>
+#include <numeric>
 #include <stdexcept>
 
 int stoi_substr(std::string_view s, size_t start, size_t *end) {
@@ -58,12 +59,14 @@ Ancestry getCherries(std::string_view newick) {
 }
 
 Ancestry getCherriesNoParents(std::string_view newick) {
+    const size_t newickLength = newick.length();
+
     Ancestry ancestry;
-    ancestry.reserve(newick.length());
+    ancestry.reserve(newickLength);
 
     std::vector<int> stack;
 
-    for (size_t i = 0; i < newick.length(); ++i) {
+    for (size_t i = 0; i < newickLength; ++i) {
         char c = newick[i];
 
         if (c == ')') {
@@ -80,7 +83,6 @@ Ancestry getCherriesNoParents(std::string_view newick) {
 
             // Push the min leaf to the stack
             int cMin = std::min(c1, c2);
-            // c1 = cMin;
             stack.push_back(cMin);
         } else if (c >= '0' && c <= '9') {
             // Get the next leaf and push it to the stack
@@ -137,10 +139,7 @@ void orderCherriesNoParents(Ancestry &ancestry) {
     const int numCherries = ancestry.size();
 
     // Copy of current ancestry
-    const Ancestry oldAncestry = ancestry;
-
-    // Index ordering for the new ancestry
-    std::vector<std::uint8_t> idxs(numCherries, 0);
+    // Ancestry oldAncestry = ancestry;
 
     for (int i = 0; i < numCherries; ++i) {
         // Find the next index to process:
@@ -150,27 +149,23 @@ void orderCherriesNoParents(Ancestry &ancestry) {
         // it means that leaf was already involved in a shallower cherry
         int idx;
 
-        // Initially, all leaves have not been processed
+        // Initially, all cherries have not been processed
         std::vector<std::uint8_t> unvisited(numCherries + 1, 1);
 
         // Temporary max leaf
-        int maxLeaf = -1;
+        int maxLeaf = 0;
 
-        for (int j = 0; j < numCherries; ++j) {
+        for (int j = i; j < numCherries; ++j) {
             // Row j was processed --> continue
-            if (idxs[j]) {
-                continue;
-            }
+            // if (idxs[j]) {
+            //     continue;
+            // }
 
-            auto &[c1, c2, cMax] = oldAncestry[j];
+            auto &[c1, c2, cMax] = ancestry[j];
 
-            // Are c1 and c2 both un-visited?
-            if (unvisited[c1] && unvisited[c2]) {
-                // If yes, is max(c1, c2) > maxLeaf?
-                if (cMax > maxLeaf) {
-                    // If yes again, update maxLeaf
+            if (cMax > maxLeaf) {
+                if (unvisited[c1] && unvisited[c2]) {
                     maxLeaf = cMax;
-                    // index to swap <-- j
                     idx = j;
                 }
             }
@@ -179,37 +174,41 @@ void orderCherriesNoParents(Ancestry &ancestry) {
             unvisited[c1] = 0;
             unvisited[c2] = 0;
         }
+
         // Swap the rows for the new ancestry
         // row idx becomes row i
-        ancestry[i] = oldAncestry[idx];
-
-        // Row idx has been processed
-        idxs[idx] = 1;
+        // From:
+        // https://stackoverflow.com/questions/45447361/how-to-move-certain-elements-of-stdvector-to-a-new-index-within-the-vector
+        if (idx != i) {
+            std::rotate(ancestry.begin() + i, ancestry.begin() + idx,
+                        ancestry.begin() + idx + 1);
+        }
     }
 }
 
 PhyloVec buildVector(Ancestry cherries) {
     const size_t numCherries = cherries.size();
+    const size_t numLeaves = numCherries + 1;
 
     PhyloVec v(numCherries, 0);
 
+    std::vector<uint8_t> idxs(numLeaves, 0);
+
     // Note: v[0] is always 0
     // but starting with i = 1 makes some tests fail (weird)
-
     for (size_t i = 0; i < numCherries; ++i) {
         auto &[c1, c2, cMax] = cherries[i];
 
         int idx = 0;
 
-        for (int j = i - 1; j >= 0; --j) {
-            if (cherries[j][2] <= cMax) {
-                ++idx;
-            } else {
-                break;
-            }
+        for (int j = 1; j < cMax; ++j) {
+            idx += idxs[j];
         }
 
+        // Reminder: v[i] = j --> branch i yields leaf j
         v[cMax - 1] = idx == 0 ? std::min(c1, c2) : cMax - 1 + idx;
+
+        idxs[cMax] = 1;
     }
 
     return v;
