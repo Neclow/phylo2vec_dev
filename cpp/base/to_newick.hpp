@@ -31,7 +31,9 @@ Ancestry getAncestry(const PhyloVec &v);
 std::string buildNewick(const Ancestry &ancestry);
 
 /**
- * @brief Wrapper of getAncestry and buildNewick
+ * @brief Convert a Phylo2Vec vector to a Newick string.
+ * Wraps getAncestry and buildNewick
+ *
  *
  * @param v Phylo2Vec vector
  */

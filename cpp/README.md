@@ -30,3 +30,15 @@ make
 ```bash
 ./phylo2vec_bench
 ```
+
+## Python
+
+```bash
+pip install -e .
+```
+
+## R
+
+```bash
+source("R/build.R")
+```
