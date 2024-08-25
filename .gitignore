@@ -213,4 +213,4 @@ trees/
 *.app
 
 # Other
-build2/
+build*/

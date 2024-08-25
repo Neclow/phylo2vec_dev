@@ -138,9 +138,6 @@ void orderCherriesNoParents(Ancestry &ancestry) {
     // numCherries = numLeaves - 1
     const int numCherries = ancestry.size();
 
-    // Copy of current ancestry
-    // Ancestry oldAncestry = ancestry;
-
     for (int i = 0; i < numCherries; ++i) {
         // Find the next index to process:
         // The goal is to find the row with the highest leaf
@@ -156,11 +153,6 @@ void orderCherriesNoParents(Ancestry &ancestry) {
         int maxLeaf = 0;
 
         for (int j = i; j < numCherries; ++j) {
-            // Row j was processed --> continue
-            // if (idxs[j]) {
-            //     continue;
-            // }
-
             auto &[c1, c2, cMax] = ancestry[j];
 
             if (cMax > maxLeaf) {
@@ -175,10 +167,7 @@ void orderCherriesNoParents(Ancestry &ancestry) {
             unvisited[c2] = 0;
         }
 
-        // Swap the rows for the new ancestry
-        // row idx becomes row i
-        // From:
-        // https://stackoverflow.com/questions/45447361/how-to-move-certain-elements-of-stdvector-to-a-new-index-within-the-vector
+        // Move row idx to row i
         if (idx != i) {
             std::rotate(ancestry.begin() + i, ancestry.begin() + idx,
                         ancestry.begin() + idx + 1);

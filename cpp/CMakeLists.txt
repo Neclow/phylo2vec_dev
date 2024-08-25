@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.22.1)
-project(phylo2vec)
+project(
+    phylo2vec
+    VERSION 1.0.0
+    LANGUAGES CXX
+)
 
-# GoogleTest requires at least C++14
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -9,17 +13,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-# Include Google Test using FetchContent
 include(FetchContent)
-FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG release-1.11.0 # dpkg -l libgtest-dev
-)
-FetchContent_MakeAvailable(googletest)
-
-# Find benchmark package
-find_package(benchmark REQUIRED)
 
 # Include fmt using FetchContent
 # FetchContent_Declare(
@@ -39,6 +33,10 @@ set(SOURCES
     utils/vector.cpp
 )
 
+set(BENCH_SOURCES
+    benchmarks/bench_base.cpp
+)
+
 set(TEST_SOURCES
     tests/test_main.cpp
     tests/test_v2newick2v.cpp
@@ -46,27 +44,47 @@ set(TEST_SOURCES
 )
 
 # Main library
-add_library(phylo2vec_cpp SHARED ${SOURCES})
+add_library(phylo2vec_cpp STATIC ${SOURCES})
 
 # Add git submodules
 add_subdirectory(extern)
 
 # Main executable
-add_executable(phylo2vec_main main.cpp ${SOURCES})
+# add_executable(phylo2vec_main main.cpp ${SOURCES})
 
-target_link_libraries(phylo2vec_main phylo2vec_cpp)
+# target_link_libraries(phylo2vec_main phylo2vec_cpp)
 
-# Test executable
-add_executable(phylo2vec_test ${TEST_SOURCES} ${SOURCES})
+if(BUILD_TESTING)
+    # Include Google Test using FetchContent
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG release-1.11.0 # dpkg -l libgtest-dev
+    )
 
-# Link against Google Test and Google Mock
-target_link_libraries(phylo2vec_test PRIVATE gtest_main)
+    FetchContent_MakeAvailable(googletest)
+    # Test executable
+    add_executable(phylo2vec_test ${TEST_SOURCES} ${SOURCES})
 
-# Add tests
-add_test(NAME phylo2vec_test COMMAND phylo2vec_test)
+    # Link against Google Test and Google Mock
+    target_link_libraries(phylo2vec_test PRIVATE gtest_main)
+
+    # Add tests
+    add_test(NAME phylo2vec_test COMMAND phylo2vec_test)
+endif()
 
 # Benchmarking
-add_executable(phylo2vec_bench benchmarks/bench_base.cpp ${SOURCES})
+if(BUILD_BENCHMARKS)
+    # Find benchmark package
+    find_package(benchmark REQUIRED)
 
-# Link against Google benchmark
-target_link_libraries(phylo2vec_bench PUBLIC benchmark::benchmark)
+    # Add bench_base.cpp
+    add_executable(phylo2vec_bench ${BENCH_SOURCES} ${SOURCES})
+
+    # Link against Google benchmark
+    target_link_libraries(phylo2vec_bench PUBLIC benchmark::benchmark)
+endif()
+
+if(BUILD_PYTHON)
+  add_subdirectory(python)
+endif()
