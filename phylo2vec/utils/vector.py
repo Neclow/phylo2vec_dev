@@ -236,7 +236,6 @@ def _find_indices_of_first_leaf(ancestry, leaf):
     for r in range(ancestry.shape[0]):
         for c in range(ancestry.shape[1]):
             if ancestry[r, c] == leaf:
-                print(r, c)
                 return r, c
 
 
