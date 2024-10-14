@@ -6,8 +6,6 @@
 
 #include <benchmark/benchmark.h>
 
-constexpr int NUM_LEAVES = 1024;
-
 // Benchmark sample
 static void BM_sample(benchmark::State &state) {
     int n = state.range(0);
@@ -60,15 +58,12 @@ static void BM_toVectorNoParents(benchmark::State &state) {
     }
 }
 
-BENCHMARK(BM_sample)->Range(8 << 6, 8 << 13)->Unit(benchmark::kMillisecond);
+#define BENCHMARK_RANGE Range(8 << 6, 8 << 12)->Unit(benchmark::kMillisecond)
 
-BENCHMARK(BM_toNewick)->Range(8 << 6, 8 << 13)->Unit(benchmark::kMillisecond);
-
-BENCHMARK(BM_toVector)->Range(8 << 6, 8 << 13)->Unit(benchmark::kMillisecond);
-
-BENCHMARK(BM_toVectorNoParents)
-    ->Range(8 << 6, 8 << 13)
-    ->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_sample)->BENCHMARK_RANGE;
+BENCHMARK(BM_toNewick)->BENCHMARK_RANGE;
+BENCHMARK(BM_toVector)->BENCHMARK_RANGE;
+BENCHMARK(BM_toVectorNoParents)->BENCHMARK_RANGE;
 
 // Run the benchmark
 BENCHMARK_MAIN();
