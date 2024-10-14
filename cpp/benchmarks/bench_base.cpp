@@ -60,24 +60,14 @@ static void BM_toVectorNoParents(benchmark::State &state) {
     }
 }
 
-BENCHMARK(BM_sample)
-    ->Arg(NUM_LEAVES / 2)
-    ->Arg(NUM_LEAVES)
-    ->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_sample)->Range(8 << 6, 8 << 13)->Unit(benchmark::kMillisecond);
 
-BENCHMARK(BM_toNewick)
-    ->Arg(NUM_LEAVES / 2)
-    ->Arg(NUM_LEAVES)
-    ->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_toNewick)->Range(8 << 6, 8 << 13)->Unit(benchmark::kMillisecond);
 
-BENCHMARK(BM_toVector)
-    ->Arg(NUM_LEAVES / 2)
-    ->Arg(NUM_LEAVES)
-    ->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_toVector)->Range(8 << 6, 8 << 13)->Unit(benchmark::kMillisecond);
 
 BENCHMARK(BM_toVectorNoParents)
-    ->Arg(NUM_LEAVES / 2)
-    ->Arg(NUM_LEAVES)
+    ->Range(8 << 6, 8 << 13)
     ->Unit(benchmark::kMillisecond);
 
 // Run the benchmark

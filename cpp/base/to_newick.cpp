@@ -10,38 +10,41 @@ Ancestry getAncestry(const PhyloVec &v) {
     std::vector<std::array<unsigned int, 2>> pairs;
     pairs.reserve(k);
 
-    // The first pair of leaves if always (0, 1)
-    pairs.push_back({0, 1});
+    for (unsigned int i = k; i-- > 0;) {
+        /*
+        If v[i] <= i, it's like a birth-death process
+        We now that the next pair to add now is (v[i], next_leaf)
+        (as the branch leading to v[i] gives birth to the next_leaf)
 
-    // The goal here is to add mergers like in the previous iteration
-    for (size_t i = 1; i < k; ++i) {
-        // The nextLeaf to add is i + 1
+        Why pairs.insert(0)? Let's take an example with [0, 0]
+        We initially have (0, 1), but 0 gives birth to 2 afterwards
+        So the "shallowest" pair is (0, 2)
+        */
         unsigned int nextLeaf = i + 1;
-
         if (v[i] <= i) {
-            /*
-            If v[i] <= i, it's like a birth-death process
-            We now that the next pair to add now is (v[i], next_leaf)
-            (as the branch leading to v[i] gives birth to the next_leaf)
+            pairs.push_back({v[i], nextLeaf});
+        }
+    }
 
-            Why pairs.insert(0)? Let's take an example with [0, 0]
-            We initially have (0, 1), but 0 gives birth to 2 afterwards
-            So the "shallowest" pair is (0, 2)
-            */
-            pairs.insert(pairs.begin(), {v[i], nextLeaf});
-        } else {
+    for (size_t j = 1; j < k; ++j) {
+        unsigned int nextLeaf = j + 1;
+        if (v[j] == 2 * j) {
+            // 2*j = extra root ==> pairing = (0, next_leaf)
+            pairs.push_back({0, nextLeaf});
+        } else if (v[j] > j) {
             /*
-            If v[i] > i, it's not the branch leading v[i] that gives birth but
-            an internal branch
+            If v[i] > i, it's not the branch leading v[i] that gives birth
+            but an internal branch
 
-            Thus, it will not be the "shallowest" pair, so we do not insert it
-            at position 0, but instead at v[i] - i (i = len(pairs))
+            Thus, it will not be the "shallowest" pair, so we do not insert
+            it at position 0, but instead at v[i] - i (i = len(pairs))
 
             pairs[v[i] - i - 1][0] is a node that we processed
             beforehand which is deeper than the branch v[i]
             */
-            pairs.insert(pairs.begin() + v[i] - i,
-                         {pairs[v[i] - i - 1][0], nextLeaf});
+            size_t index = pairs.size() + v[j] - 2 * j;
+            pairs.insert(pairs.begin() + index,
+                         {pairs[index - 1][0], nextLeaf});
         }
     }
 
