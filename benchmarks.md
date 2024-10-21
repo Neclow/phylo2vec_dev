@@ -54,7 +54,7 @@ Approx. execution times (ms)
 | sample               | 32768 | 0.294 | 0.728  | 0.222 | julia  |
 | to_newick            | 512   | 0.19  | 0.22   | 0.24  | cpp    |
 | to_newick            | 1024  | 0.34  | 0.47   | 0.64  | cpp    |
-| to_newick            | 4096  | 1.89  | 2.29   | 4.6  | cpp    |
+| to_newick            | 4096  | 1.89  | 2.29   | 4.6   | cpp    |
 | to_newick            | 32768 | 34.0  | 27     | 117.6 | python |
 | to_vector            | 512   | 0.38  | 1.7    | 0.4   | cpp    |
 | to_vector            | 1024  | 1.2   | 5.7    | 1.5   | cpp    |
