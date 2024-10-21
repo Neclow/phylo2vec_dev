@@ -1,54 +1,6 @@
 #include "to_newick.hpp"
 
 std::vector<Pair> getPairs(const PhyloVec &v) {
-    // numLeaves - 1
-    const size_t k = v.size();
-
-    std::vector<Pair> pairs;
-    pairs.reserve(k);
-
-    for (unsigned int i = k; i-- > 0;) {
-        /*
-        If v[i] <= i, it's like a birth-death process
-        We now that the next pair to add now is (v[i], next_leaf)
-        (as the branch leading to v[i] gives birth to the next_leaf)
-
-        Why pairs.insert(0)? Let's take an example with [0, 0]
-        We initially have (0, 1), but 0 gives birth to 2 afterwards
-        So the "shallowest" pair is (0, 2)
-        */
-        unsigned int nextLeaf = i + 1;
-        if (v[i] <= i) {
-            pairs.push_back({v[i], nextLeaf});
-        }
-    }
-
-    for (size_t j = 1; j < k; ++j) {
-        unsigned int nextLeaf = j + 1;
-        if (v[j] == 2 * j) {
-            // 2*j = extra root ==> pairing = (0, next_leaf)
-            pairs.push_back({0, nextLeaf});
-        } else if (v[j] > j) {
-            /*
-            If v[i] > i, it's not the branch leading v[i] that gives birth
-            but an internal branch
-
-            Thus, it will not be the "shallowest" pair, so we do not insert
-            it at position 0, but instead at v[i] - i (i = len(pairs))
-
-            pairs[v[i] - i - 1][0] is a node that we processed
-            beforehand which is deeper than the branch v[i]
-            */
-            size_t index = pairs.size() + v[j] - 2 * j;
-            pairs.insert(pairs.begin() + index,
-                         {pairs[index - 1][0], nextLeaf});
-        }
-    }
-
-    return pairs;
-}
-
-std::vector<Pair> getPairs2(const PhyloVec &v) {
     const size_t k = v.size();
 
     AVLTree avl_tree;
@@ -59,8 +11,27 @@ std::vector<Pair> getPairs2(const PhyloVec &v) {
         unsigned int nextLeaf = i + 1;
 
         if (v[i] <= i) {
+            /*
+            If v[i] <= i, it's like a birth-death process
+            We now that the next pair to add now is (v[i], next_leaf)
+            (as the branch leading to v[i] gives birth to the next_leaf)
+
+            Why pairs.insert(0)? Let's take an example with [0, 0]
+            We initially have (0, 1), but 0 gives birth to 2 afterwards
+            So the "shallowest" pair is (0, 2)
+            */
             avl_tree.insert(0, {v[i], nextLeaf});
         } else {
+            /*
+            If v[i] > i, it's not the branch leading v[i] that gives birth
+            but an internal branch
+
+            Thus, it will not be the "shallowest" pair, so we do not insert
+            it at position 0, but instead at v[i] - i (i = len(pairs))
+
+            pairs[v[i] - i - 1][0] is a node that we processed
+            beforehand which is deeper than the branch v[i]
+            */
             unsigned int index = v[i] - nextLeaf;
             Pair value = avl_tree.lookup(avl_tree.root, index);
 
@@ -74,7 +45,7 @@ std::vector<Pair> getPairs2(const PhyloVec &v) {
 Ancestry getAncestry(const PhyloVec &v) {
     const size_t k = v.size();
 
-    std::vector<Pair> pairs = getPairs2(v);
+    std::vector<Pair> pairs = getPairs(v);
 
     // Matrix with 3 columns: child1, child2, parent
     Ancestry ancestry(k);
