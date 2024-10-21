@@ -107,7 +107,8 @@ def _get_ancestry(v):
 
     return ancestry
 
-@nb.njit(cache=True)
+
+@nb.njit
 def _build_newick(ancestry):
     """Build a Newick string from an "ancestry" array
 
@@ -129,32 +130,32 @@ def _build_newick(ancestry):
     newick : str
         Newick string
     """
+    root = ancestry[-1][-1]
 
-    # TODO: drop the ancestry matrix form?
-    ancestry_dict = nb.typed.Dict.empty(key_type=nb.types.int64, value_type=value_type)
-
-    for c1, c2, p in ancestry:
-        ancestry_dict[p] = (c1, c2)
-
-    newick = f"{_build_newick_inner(ancestry[-1][-1], ancestry_dict)};"
+    newick = _build_newick_inner(root, ancestry) + ";"
 
     return newick
 
 
 @nb.njit
-def _build_newick_inner(node, ancestry_dict):
-    if node in ancestry_dict:
-        c1, c2 = ancestry_dict.pop(node)
-        return (
-            "("
-            + _build_newick_inner(c1, ancestry_dict)
-            + ","
-            + _build_newick_inner(c2, ancestry_dict)
-            + ")"
-            + f"{node}"
-        )
+def _build_newick_inner(node, ancestry):
+    leaf_max = ancestry.shape[0]
+
+    c1, c2, _ = ancestry[node - leaf_max - 1]
+
+    if c1 > leaf_max:
+        left = _build_newick_inner(c1, ancestry)
     else:
-        return f"{node}"
+        left = f"{c1}"
+
+    if c2 > leaf_max:
+        right = _build_newick_inner(c2, ancestry)
+    else:
+        right = f"{c2}"
+
+    newick = f"({left},{right}){node}"
+
+    return newick
 
 
 @nb.njit(cache=True)
