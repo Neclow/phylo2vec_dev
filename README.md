@@ -51,6 +51,13 @@ After installation, you can launch the test suite from outside the source direct
 pytest phylo2vec
 ```
 
+Warning! You might need to clear your ```__pycache__``` folders beforehand:
+
+```bash
+rm -rf phylo2vec/__pycache__/
+rm -rf phylo2vec/base/__pycache__/
+```
+
 ## Basic usage
 
 ### Conversions
