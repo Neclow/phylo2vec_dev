@@ -24,6 +24,7 @@ include(FetchContent)
 
 # Source files
 set(SOURCES
+    base/avl.cpp
     base/to_newick.cpp
     base/to_vector.cpp
     matrix/to_newick.cpp

@@ -1,13 +1,10 @@
 #include "to_newick.hpp"
 
-Ancestry getAncestry(const PhyloVec &v) {
+std::vector<Pair> getPairs(const PhyloVec &v) {
     // numLeaves - 1
     const size_t k = v.size();
 
-    // Matrix with 3 columns: child1, child2, parent
-    Ancestry ancestry(k);
-
-    std::vector<std::array<unsigned int, 2>> pairs;
+    std::vector<Pair> pairs;
     pairs.reserve(k);
 
     for (unsigned int i = k; i-- > 0;) {
@@ -47,6 +44,40 @@ Ancestry getAncestry(const PhyloVec &v) {
                          {pairs[index - 1][0], nextLeaf});
         }
     }
+
+    return pairs;
+}
+
+std::vector<Pair> getPairs2(const PhyloVec &v) {
+    const size_t k = v.size();
+
+    AVLTree avl_tree;
+
+    avl_tree.insert(0, {0, 1});
+
+    for (size_t i = 1; i < k; ++i) {
+        unsigned int nextLeaf = i + 1;
+
+        if (v[i] <= i) {
+            avl_tree.insert(0, {v[i], nextLeaf});
+        } else {
+            unsigned int index = v[i] - nextLeaf;
+            Pair value = avl_tree.lookup(avl_tree.root, index);
+
+            avl_tree.insert(index + 1, {value[0], nextLeaf});
+        }
+    }
+
+    return avl_tree.getPairs();
+}
+
+Ancestry getAncestry(const PhyloVec &v) {
+    const size_t k = v.size();
+
+    std::vector<Pair> pairs = getPairs2(v);
+
+    // Matrix with 3 columns: child1, child2, parent
+    Ancestry ancestry(k);
 
     // Keep track of the following relationship: child->highest parent
     std::vector<int> parents(2 * k + 1, -1);

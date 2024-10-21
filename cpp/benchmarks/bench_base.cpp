@@ -58,12 +58,42 @@ static void BM_toVectorNoParents(benchmark::State &state) {
     }
 }
 
+// Benchmark getPairs
+static void BM_getPairs(benchmark::State &state) {
+    int n = state.range(0);
+    for (auto _ : state) {
+        state.PauseTiming();
+        PhyloVec v = sample(n);
+        state.ResumeTiming();
+        std::vector<Pair> pairs = getPairs(v);
+        benchmark::DoNotOptimize(pairs);
+        benchmark::ClobberMemory();
+    }
+}
+
+// Benchmark getPairs2
+static void BM_getPairs2(benchmark::State &state) {
+    int n = state.range(0);
+    for (auto _ : state) {
+        state.PauseTiming();
+        PhyloVec v = sample(n);
+        state.ResumeTiming();
+        std::vector<Pair> pairs2 = getPairs2(v);
+        benchmark::DoNotOptimize(pairs2);
+        benchmark::ClobberMemory();
+    }
+}
+
 #define BENCHMARK_RANGE Range(8 << 6, 8 << 12)->Unit(benchmark::kMillisecond)
+#define BIGBENCHMARK_RANGE Range(8 << 6, 8 << 18)->Unit(benchmark::kMillisecond)
 
 BENCHMARK(BM_sample)->BENCHMARK_RANGE;
 BENCHMARK(BM_toNewick)->BENCHMARK_RANGE;
 BENCHMARK(BM_toVector)->BENCHMARK_RANGE;
 BENCHMARK(BM_toVectorNoParents)->BENCHMARK_RANGE;
+
+// BENCHMARK(BM_getPairs)->BIGBENCHMARK_RANGE;
+BENCHMARK(BM_getPairs2)->BIGBENCHMARK_RANGE;
 
 // Run the benchmark
 BENCHMARK_MAIN();

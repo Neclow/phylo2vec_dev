@@ -11,6 +11,8 @@
 #include <string_view>
 #include <vector>
 
+typedef std::array<unsigned int, 2> Pair;
+
 /**
  * @brief Phylo2Vec vector v
  * Let n the number of leaves:
