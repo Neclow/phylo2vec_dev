@@ -8,3 +8,6 @@ unsigned int removeLeaf(PhyloVec &v, unsigned int leaf);
 void addLeaf(PhyloVec &v, unsigned int leaf, unsigned int pos);
 std::pair<size_t, size_t> findCoordsOfFirstLeaf(const Ancestry &ancestry,
                                                 int leaf);
+std::vector<std::vector<unsigned int>> getAncestryPaths(const PhyloVec &v);
+int getCommonAncestor(const PhyloVec &v, unsigned int node1,
+                      unsigned int node2);

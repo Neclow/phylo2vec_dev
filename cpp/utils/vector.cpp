@@ -110,3 +110,52 @@ unsigned int removeLeaf(PhyloVec &v, unsigned int leaf) {
 
     return sister;
 }
+
+std::vector<std::vector<unsigned int>> getAncestryPaths(const PhyloVec &v) {
+    Ancestry ancestry = getAncestry(v);
+
+    unsigned int root = 2 * v.size();
+
+    std::vector<unsigned int> parent_vec(root, 0);
+
+    for (size_t i = 0; i < v.size(); ++i) {
+        parent_vec[ancestry[i][0]] = ancestry[i][2];
+        parent_vec[ancestry[i][1]] = ancestry[i][2];
+    }
+
+    std::vector<std::vector<unsigned int>> ancestryPaths;
+
+    for (unsigned int j = 0; j < root; ++j) {
+        unsigned int lastNode = j;
+        std::vector<unsigned int> path = {lastNode};
+
+        while (lastNode != root) {
+            lastNode = parent_vec[path[0]];
+            path.push_back(lastNode);
+        }
+
+        ancestryPaths.push_back(path);
+    }
+
+    return ancestryPaths;
+}
+int getCommonAncestor(const PhyloVec &v, unsigned int node1,
+                      unsigned int node2) {
+    std::vector<std::vector<unsigned int>> ancestry_paths = getAncestryPaths(v);
+
+    std::vector<unsigned int> path1 = ancestry_paths[node1];
+    std::vector<unsigned int> path2 = ancestry_paths[node2];
+
+    unsigned int i = 0, j = 0;
+    while (i < path1.size() && j < path2.size()) {
+        if (path1[i] == path2[j]) {
+            return path1[i]; // Found MRCA
+        } else if (path1[i] < path2[j]) {
+            i++; // Move pointer in vec1 forward
+        } else {
+            j++; // Move pointer in vec2 forward
+        }
+    }
+
+    return 2 * v.size(); // No common element found --> return root
+}
