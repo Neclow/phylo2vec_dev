@@ -85,9 +85,6 @@ def _get_ancestry(v):
     # Dictionary to keep track of the following relationship: child->highest parent
     parents = nb.typed.Dict.empty(key_type=nb.types.int64, value_type=nb.types.int64)
 
-    # Dictionary to keep track of siblings (i.e., sister nodes)
-    # siblings = nb.typed.Dict.empty(key_type=nb.types.int64, value_type=nb.types.int64)
-
     # Leaves are number 0, 1, ..., n_leaves - 1, so the next parent is n_leaves
     next_parent = len(v) + 1
 

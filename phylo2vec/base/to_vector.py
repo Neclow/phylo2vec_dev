@@ -64,8 +64,10 @@ def _reduce_no_parents(newick):
 
 
 @nb.njit(cache=True)
-def _order_cherries(ancestry):
-    ancestry_sorted = ancestry[np.argsort(ancestry[:, -1]), :]
+def _find_cherries(ancestry):
+    idxs = np.argsort(ancestry[:, -1])
+
+    ancestry_sorted = ancestry[idxs, :]
 
     small_children = nb.typed.Dict.empty(
         key_type=nb.types.int16, value_type=nb.types.int16
@@ -79,7 +81,8 @@ def _order_cherries(ancestry):
         small_children[p] = min(parent_c1, parent_c2)
 
         ancestry_sorted[i, :] = [parent_c1, parent_c2, max(parent_c1, parent_c2)]
-    return ancestry_sorted
+
+    return ancestry_sorted, idxs
 
 
 @nb.njit(cache=True)
@@ -88,14 +91,15 @@ def _order_cherries_no_parents(cherries):
 
     old_cherries = cherries.copy()
 
-    idxs = np.zeros((n_cherries,), dtype=np.uint8)
+    idxs = []  # np.zeros((n_cherries,), dtype=np.uint8)
 
     for i in range(n_cherries):
         unvisited = np.ones((n_cherries + 1,), dtype=np.uint8)
         max_leaf = -1
+        idx = -1
 
         for j, ch in enumerate(old_cherries):
-            if idxs[j] == 1:
+            if j in idxs:
                 continue
 
             c1, c2, c_max = ch
@@ -113,9 +117,10 @@ def _order_cherries_no_parents(cherries):
         cherries[i] = old_cherries[idx]
 
         # Row idx has been processed
-        idxs[idx] = 1
+        # idxs[idx] = 1
+        idxs.append(idx)
 
-    return cherries
+    return cherries, np.asarray(idxs)
 
 
 @nb.njit(cache=True)
@@ -139,7 +144,8 @@ def _build_vector(cherries):
 
 
 def to_vector(newick):
-    """Convert a Newick string with parent labels to a vector
+    """
+    Convert a Newick string with parent labels to a vector
 
     Parameters
     ----------
@@ -153,7 +159,7 @@ def to_vector(newick):
     """
     ancestry = _reduce(newick)
 
-    cherries = _order_cherries(ancestry)
+    cherries, _ = _find_cherries(ancestry)
 
     v = _build_vector(cherries)
 
@@ -161,7 +167,8 @@ def to_vector(newick):
 
 
 def to_vector_no_parents(newick_no_parents):
-    """Convert a Newick string without parent labels to a vector
+    """
+    Convert a Newick string without parent labels to a vector
 
     Parameters
     ----------
@@ -175,7 +182,7 @@ def to_vector_no_parents(newick_no_parents):
     """
     ancestry = _reduce_no_parents(newick_no_parents)
 
-    cherries = _order_cherries_no_parents(ancestry)
+    cherries, _ = _order_cherries_no_parents(ancestry)
 
     v = _build_vector(cherries)
 

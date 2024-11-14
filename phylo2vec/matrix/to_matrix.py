@@ -2,7 +2,7 @@ import numpy as np
 
 from phylo2vec.base.to_vector import (
     _build_vector,
-    _order_cherries,
+    _find_cherries,
     _order_cherries_no_parents,
 )
 
@@ -75,20 +75,44 @@ def _reduce_no_parents_with_bls(newick):
 
 
 def to_matrix(newick):
+    """
+    Convert a Newick string with parent labels and branch lengths to a matrix
+
+    This functions wraps a new _reduce function with branch lengths
+    and the base functions ```_find_cherries``` and ```_build_vector```
+
+    Parameters
+    ----------
+    newick : str
+        Newick string for a tree
+
+    Returns
+    -------
+    m : numpy.ndarray
+        Phylo2Mat matrix
+    """
     ancestry, bls = _reduce_with_bls(newick)
 
-    cherries = _order_cherries(ancestry)
+    cherries, idxs = _find_cherries(ancestry)
+
+    bls = bls[idxs]
 
     v = _build_vector(cherries)
 
-    return v, bls
+    m = np.concatenate([v[:, None], bls.astype(np.float16)], axis=1)
+
+    return m
 
 
 def to_matrix_no_parents(newick_no_parents):
     ancestry, bls = _reduce_no_parents_with_bls(newick_no_parents)
 
-    cherries = _order_cherries_no_parents(ancestry)
+    cherries, idxs = _order_cherries_no_parents(ancestry)
+
+    bls = bls[idxs]
 
     v = _build_vector(cherries)
 
-    return v, bls
+    m = np.concatenate([v[:, None], bls.astype(np.float16)], axis=1)
+
+    return m

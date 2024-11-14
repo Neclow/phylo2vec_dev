@@ -8,7 +8,7 @@ from ete3 import Tree
 from phylo2vec.tests.config import MIN_N_LEAVES, MAX_N_LEAVES, N_REPEATS
 from phylo2vec.base import to_newick, to_vector, to_vector_no_parents
 from phylo2vec.base.to_vector import (
-    _order_cherries,
+    _find_cherries,
     _order_cherries_no_parents,
     _reduce,
     _reduce_no_parents,
@@ -45,8 +45,8 @@ def test_cherries_no_parents(n_leaves):
         v = sample(n_leaves)
         newick = to_newick(v)
         newick_no_parents = Tree(newick).write(format=9)
-        cherries = _order_cherries(_reduce(newick))
-        cherries_no_parents = _order_cherries_no_parents(
+        cherries, _ = _find_cherries(_reduce(newick))
+        cherries_no_parents, _ = _order_cherries_no_parents(
             _reduce_no_parents(newick_no_parents)
         )
 

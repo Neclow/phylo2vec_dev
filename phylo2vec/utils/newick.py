@@ -142,8 +142,8 @@ def remove_parent_labels(newick):
     open_idx = -1
     newick_no_parent = newick
     for i, char in enumerate(newick):
-        if (char in (",", ")", ";")) and open_idx != -1:
-            newick_no_parent = newick_no_parent.replace(newick[open_idx:i], "")
+        if (char in (",", ")", ";", ":")) and open_idx != -1:
+            newick_no_parent = newick_no_parent.replace(newick[open_idx : i + 1], char)
             open_idx = -1
         if char == ")":
             open_idx = i + 1

@@ -9,8 +9,8 @@ from .newick import (
     remove_annotations,
     remove_parent_labels,
 )
-from .random import sample, seed_everything
-from .validation import check_v
+from .random import sample, sample_matrix, seed_everything
+from .validation import check_v, check_m
 from .vector import (
     add_leaf,
     get_common_ancestor,
@@ -23,6 +23,7 @@ from .vector import (
 __all__ = [
     "add_leaf",
     "apply_label_mapping",
+    "check_m",
     "check_v",
     "create_label_mapping",
     "find_num_leaves",
@@ -33,5 +34,6 @@ __all__ = [
     "reorder_v",
     "reroot_at_random",
     "sample",
+    "sample_matrix",
     "seed_everything",
 ]
