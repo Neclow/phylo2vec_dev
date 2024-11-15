@@ -17,6 +17,10 @@ from phylo2vec.base.to_vector import (
 from phylo2vec.utils.validation import check_v
 
 
+def is_ordered(v):
+    return np.all(v <= np.arange(v.shape[0]))
+
+
 def reorder_v(reorder_method, v_old, label_mapping_old):
     """Shuffle v by reordering leaf labels
 

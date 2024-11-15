@@ -14,6 +14,7 @@ from .validation import check_v, check_m
 from .vector import (
     add_leaf,
     get_common_ancestor,
+    is_ordered,
     remove_leaf,
     reorder_v,
     reroot_at_random,
@@ -28,6 +29,7 @@ __all__ = [
     "create_label_mapping",
     "find_num_leaves",
     "get_common_ancestor",
+    "is_ordered",
     "remove_annotations",
     "remove_leaf",
     "remove_parent_labels",
