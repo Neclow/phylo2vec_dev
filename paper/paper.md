@@ -21,6 +21,8 @@ authors:
   - name: Anthony MV Jakob
     orcid: 0000-0002-0996-1356
     affiliation: 5
+  - name: Frederik Mølkjær Andersen
+    orcid: 0009-0004-4071-3707
   - name: Mark P Khurana
     orcid: 0000-0002-1123-7674
   - name: Don Setiawan
@@ -66,15 +68,15 @@ The presented version of \texttt{phylo2vec} addresses several limitations of [@p
 
 # Maintenance
 
-\textcolor{red}{For VISS}: paragraph to write about implemented development practices. See <https://joss.theoj.org/papers/10.21105/joss.06943>
+With Phylo2Vec, we aim to support long-term maintenance through implementing recommended software practices explicitly into the structure of the project and development workflow, rather than leaving them implied. This avoids human error as the repo's structure itself enforces good practices, rather than placing the responsibility solely on code contributors. More specifically, we have structured the project such that the Rust API contains the core algorithms, and all other language components are APIs that bind to the Rust functions. This avoids tight coupling, as it allows for the possibility of adding new languages to bind to the Rust API's, without needing to change anything in the Rust project itself. Additionally, we have established a robust continuous integration (CI) pipeline using Github Actions, which features:
 
-CI/CD: CI in Python/R/Rust, CD in Python
-CodeQL
-dependabot
-deepsource
-pre-commit-ci
-Github actions for benchmarking
-Comprehensive documentation using \texttt{Jupyterbook}.
+* Unit test frameworks for Rust ([cargo](https://crates.io)), Python ([pytest](https://github.com/pytest-dev/pytest)), and R (testthat [@wickham2011])
+* Benchmarking on the R and Python bindings
+* Code quality coverage in GitHub Actions on each pull request, using:
+  * [DeepSource](https://github.com/apps/deepsource-io) for Python and Rust
+  * [SonarQube Cloud](https://github.com/apps/sonarqubecloud) throughout all components
+
+Lastly, to complement Jupyter Notebook demos, comprehensive documentation is provided using [Jupyterbook](https://jupyterbook.org) and [Rustdoc](https://doc.rust-lang.org/rustdoc/what-is-rustdoc.html) for Python and Rust components, respectively.
 
 # Acknowledgements
 
