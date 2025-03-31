@@ -52,8 +52,7 @@ def sample_matrix(
     By default, branch lengths are sampled uniformly in (0, 1)
 
     1st column: v (topology)
-    2nd column: where to branch from v[i]
-    3rd column: length of the branch yielding leaf i
+    2nd and 3rd columns: branch lengths of cherry $i$ in the ancestry matrix
 
     Parameters
     ----------

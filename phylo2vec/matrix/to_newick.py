@@ -64,8 +64,7 @@ def to_newick(m):
         Phylo2Mat matrix
 
     * 1st column is v[i]
-    * 2nd column is where leaf i branched out from branch v[i]
-    * 3rd column is the branch length leading to leaf i
+    * 2nd and 3rd columns: branch lengths of cherry $i$ in the ancestry matrix
 
     Returns
     -------
