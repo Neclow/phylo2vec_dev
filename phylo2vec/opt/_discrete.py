@@ -16,7 +16,7 @@ from phylo2vec.opt._base import BaseOptimizer
 #     def get_rooted_edges(self, v):
 #         anc = _get_ancestry(v)
 
-#         edges = np.zeros((2 * len(v), 2), dtype=np.int16)
+#         edges = np.zeros((2 * len(v), 2), dtype=np.int32)
 
 #         for i in range(len(v)):
 #             edges[2 * i] = anc[i, [0, 2]]
@@ -63,7 +63,7 @@ class DiscreteOptimizer(BaseOptimizer):
         """
         anc = _get_ancestry(v)
 
-        edges = np.zeros((2 * len(v), 2), dtype=np.int16)
+        edges = np.zeros((2 * len(v), 2), dtype=np.int32)
 
         for i in range(len(v)):
             edges[2 * i] = anc[i, [0, 2]]
@@ -226,7 +226,7 @@ class DiscreteOptimizer(BaseOptimizer):
 
         to_visit = e[0]
 
-        visited = np.zeros((edges.max() + 1,), dtype=np.int16)
+        visited = np.zeros((edges.max() + 1,), dtype=np.int32)
 
         visited[to_visit] = 1
 

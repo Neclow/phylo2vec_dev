@@ -10,67 +10,91 @@ import numba as nb
 import numpy as np
 
 
-def _reduce(newick):
+def stoi_substr(s, start):
+    # -1 because newick strings end with a semicolon
+    s_substr = s[start:-1].split(",", 1)[0].split(")", 1)[0]
+
+    end = start + len(s_substr)
+
+    return int(s_substr), end
+
+
+def _get_cherries(newick):
     ancestry = []
+    stack = []
 
-    def do_reduce(ancestry, newick):
-        for i, char in enumerate(newick):
-            if char == "(":
-                open_idx = i + 1
-            elif char == ")":
-                child1, child2 = newick[open_idx:i].split(",", 2)
-                parent = newick[i + 1 :].split(",", 1)[0].split(")", 1)[0]
+    i = 0
+    while i < len(newick):
+        char = newick[i]
+        if char == ")":
+            i += 1
 
-                ancestry.append(
-                    [
-                        int(child1),
-                        int(child2),
-                        int(parent),
-                    ]
-                )
-                newick = newick[: open_idx - 1] + newick[i + 1 :]
+            # Pop the children nodes from the stack
+            c2 = stack.pop()
+            c1 = stack.pop()
 
-                return do_reduce(ancestry, newick)
+            # Get the parent node after )
+            p, end = stoi_substr(newick, i)
+            i = end - 1
 
-    do_reduce(ancestry, newick[:-1])
+            # Add the triplet (c1, c2, p)
+            ancestry.append([c1, c2, int(p)])
 
-    return np.array(ancestry, dtype=np.int16)
+            # Push the parent node to the stack
+            stack.append(p)
+        elif "0" <= char <= "9":
+            # Get the next node and push it to the stack
+            node, end = stoi_substr(newick, i)
+
+            stack.append(node)
+
+            i = end - 1
+
+        i += 1
+
+    return np.asarray(ancestry, dtype=np.int32)
 
 
-def _reduce_no_parents(newick):
+def _get_cherries_no_parents(newick):
     ancestry = []
+    stack = []
 
-    def do_reduce(ancestry, newick):
-        for i, char in enumerate(newick):
-            if char == "(":
-                open_idx = i + 1
-            elif char == ")":
-                child1, child2 = newick[open_idx:i].split(",", 2)
+    i = 0
+    while i < len(newick):
+        char = newick[i]
+        if char == ")":
+            # Pop the children nodes from the stack
+            c2 = stack.pop()
+            c1 = stack.pop()
 
-                child1 = int(child1)
-                child2 = int(child2)
+            c_min, c_max = sorted([c1, c2])
 
-                ancestry.append([child1, child2, max(child1, child2)])
+            # No parent annotation --> store the max leaf
+            ancestry.append([c1, c2, c_max])
 
-                newick = newick.replace(
-                    newick[open_idx - 1 : i + 1], f"{min(child1, child2)}"
-                )
+            # Push the min leaf to the stack
+            stack.append(c_min)
+        elif "0" <= char <= "9":
+            # Get the next leaf and push it to the stack
+            node, end = stoi_substr(newick, i)
 
-                return do_reduce(ancestry, newick)
+            stack.append(node)
 
-    do_reduce(ancestry, newick[:-1])
+            i = end - 1
 
-    return np.array(ancestry, dtype=np.int16)
+        i += 1
+
+    return np.asarray(ancestry, dtype=np.int32)
 
 
 @nb.njit(cache=True)
-def _find_cherries(ancestry):
+def _order_cherries(ancestry):
     idxs = np.argsort(ancestry[:, -1])
 
     ancestry_sorted = ancestry[idxs, :]
 
     small_children = nb.typed.Dict.empty(
-        key_type=nb.types.int16, value_type=nb.types.int16
+        key_type=nb.types.int32, value_type=nb.types.int32
     )
 
     for i, row in enumerate(ancestry_sorted):
@@ -125,7 +149,7 @@ def _order_cherries_no_parents(cherries):
 
 @nb.njit(cache=True)
 def _build_vector(cherries):
-    v_res = np.zeros((cherries.shape[0],), dtype=np.uint16)
+    v_res = np.zeros((cherries.shape[0],), dtype=np.uint32)
     for i in range(cherries.shape[0]):
         c1, c2, c_max = cherries[i]
 
@@ -157,9 +181,9 @@ def to_vector(newick):
     v : numpy.ndarray
         Phylo2Vec vector
     """
-    ancestry = _reduce(newick)
+    ancestry = _get_cherries(newick)
 
-    cherries, _ = _find_cherries(ancestry)
+    cherries, _ = _order_cherries(ancestry)
 
     v = _build_vector(cherries)
 
@@ -180,7 +204,7 @@ def to_vector_no_parents(newick_no_parents):
     v : numpy.ndarray
         Phylo2Vec vector
     """
-    ancestry = _reduce_no_parents(newick_no_parents)
+    ancestry = _get_cherries_no_parents(newick_no_parents)
 
     cherries, _ = _order_cherries_no_parents(ancestry)
 

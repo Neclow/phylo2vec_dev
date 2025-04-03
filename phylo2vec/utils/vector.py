@@ -10,7 +10,7 @@ from ete3 import Tree
 from phylo2vec.base.to_newick import _get_ancestry, to_newick
 from phylo2vec.base.to_vector import (
     _build_vector,
-    _find_cherries,
+    _order_cherries,
     _order_cherries_no_parents,
     to_vector_no_parents,
 )
@@ -56,7 +56,7 @@ def reorder_v(reorder_method, v_old, label_mapping_old):
 
     # Pass the dict to Numba
     label_mapping_old_ = nb.typed.Dict.empty(
-        key_type=nb.types.uint16, value_type=nb.types.unicode_type
+        key_type=nb.types.uint32, value_type=nb.types.unicode_type
     )
 
     for k, v in label_mapping_old.items():
@@ -66,7 +66,7 @@ def reorder_v(reorder_method, v_old, label_mapping_old):
         np.flip(ancestry_old, axis=0), label_mapping_old_
     )
 
-    cherries, _ = _find_cherries(ancestry_new)
+    cherries, _ = _order_cherries(ancestry_new)
 
     # Re-build v
     v_new = _build_vector(cherries)
@@ -124,7 +124,7 @@ def _reorder_birth_death(
 
     # Taxa dict to be updated
     label_mapping_new = nb.typed.Dict.empty(
-        key_type=nb.types.uint16, value_type=nb.types.unicode_type
+        key_type=nb.types.uint32, value_type=nb.types.unicode_type
     )
 
     while len(to_visit) > 0:
@@ -185,7 +185,7 @@ def _reorder_bfs(ancestry_old, label_mapping_old):
 
     # Taxa dict to be updated
     label_mapping_new = nb.typed.Dict.empty(
-        key_type=nb.types.uint16, value_type=nb.types.unicode_type
+        key_type=nb.types.uint32, value_type=nb.types.unicode_type
     )
 
     while len(to_visit) > 0:
@@ -299,7 +299,7 @@ def remove_leaf(v, leaf):
 
     # Cherries have to be ordered according to the scheme presented in Fig. 2
     # NOTE: not 100% sure why I need both orderings?
-    cherries, _ = _find_cherries(ancestry_sub)
+    cherries, _ = _order_cherries(ancestry_sub)
     cherries_no_parents, _ = _order_cherries_no_parents(cherries)
 
     # Build the new vector
@@ -352,7 +352,7 @@ def add_leaf(v, leaf, pos):
 
     # Find the cherries
     # NOTE: not 100% sure why I need both orderings?
-    cherries, _ = _find_cherries(ancestry_add)
+    cherries, _ = _order_cherries(ancestry_add)
     cherries_no_parents, _ = _order_cherries_no_parents(cherries)
 
     # Build the new vector

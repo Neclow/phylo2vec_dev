@@ -2,7 +2,7 @@ import numpy as np
 
 from phylo2vec.base.to_vector import (
     _build_vector,
-    _find_cherries,
+    _order_cherries,
     _order_cherries_no_parents,
 )
 
@@ -38,7 +38,7 @@ def _reduce_with_bls(newick):
 
     do_reduce(ancestry, bls, newick[:-1])
 
-    return np.array(ancestry, dtype=np.int16), np.array(bls, dtype=np.float16)
+    return np.array(ancestry, dtype=np.int32), np.array(bls, dtype=np.float16)
 
 
 def _reduce_no_parents_with_bls(newick):
@@ -71,7 +71,7 @@ def _reduce_no_parents_with_bls(newick):
 
     do_reduce(ancestry, bls, newick[:-1])
 
-    return np.array(ancestry, dtype=np.int16), np.array(bls, dtype=np.float16)
+    return np.array(ancestry, dtype=np.int32), np.array(bls, dtype=np.float16)
 
 
 def to_matrix(newick):
@@ -93,7 +93,7 @@ def to_matrix(newick):
     """
     ancestry, bls = _reduce_with_bls(newick)
 
-    cherries, idxs = _find_cherries(ancestry)
+    cherries, idxs = _order_cherries(ancestry)
 
     bls = bls[idxs]
 
