@@ -80,7 +80,7 @@ def _get_ancestry(v):
 
     # We have our pairs, we can now build our ancestry
     # Matrix with 3 columns: child1, child2, parent
-    ancestry = np.zeros((len(pairs), 3), dtype=np.int16)
+    ancestry = np.zeros((len(pairs), 3), dtype=np.int64)
 
     # Dictionary to keep track of the following relationship: child->highest parent
     parents = nb.typed.Dict.empty(key_type=nb.types.int64, value_type=nb.types.int64)
@@ -105,7 +105,7 @@ def _get_ancestry(v):
     return ancestry
 
 
-@nb.njit
+@nb.njit(cache=True)
 def _build_newick(ancestry):
     """Build a Newick string from an "ancestry" array
 
@@ -134,7 +134,7 @@ def _build_newick(ancestry):
     return newick
 
 
-@nb.njit
+@nb.njit(cache=True)
 def _build_newick_inner(node, ancestry):
     leaf_max = ancestry.shape[0]
 

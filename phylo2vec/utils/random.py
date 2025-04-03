@@ -34,7 +34,7 @@ def sample(n_leaves, ordered=False):
         v_list = [np.random.randint(0, i + 1) for i in range(n_leaves - 1)]
     else:
         v_list = [np.random.randint(0, 2 * i + 1) for i in range(n_leaves - 1)]
-    return np.array(v_list, dtype=np.uint16)
+    return np.array(v_list, dtype=np.uint32)
 
 
 BRANCH_LENGTH_DISTRIBUTIONS = {

@@ -75,7 +75,7 @@ def to_newick(m):
 
     v, bls = np.split(m, (1,), axis=1)
 
-    ancestry = _get_ancestry(v.astype(np.uint16)[:, 0])
+    ancestry = _get_ancestry(v.astype(np.uint32)[:, 0])
 
     newick = _build_newick_with_bls(ancestry, bls.round(6).astype(str))
 
