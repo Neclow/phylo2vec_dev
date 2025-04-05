@@ -175,6 +175,7 @@ cython_debug/
 # Where I try stuff
 drafts/
 drafts.ipynb
+tmp/
 
 # Temporary trees
 trees/

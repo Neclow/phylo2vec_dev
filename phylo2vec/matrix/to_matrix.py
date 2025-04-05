@@ -33,7 +33,6 @@ def _get_cherries_with_bls(newick):
             c1 = stack.pop()
 
             # Pop the BLs from the BL stack
-            # Add the pair (bl1, bl2)
             bl2 = bl_stack.pop()
             bl1 = bl_stack.pop()
             bls.append([bl1, bl2])
@@ -71,7 +70,7 @@ def _get_cherries_with_bls(newick):
     return np.asarray(ancestry, dtype=np.int32), np.asarray(bls, dtype=np.float16)
 
 
-# TODO: handle newick without parents + parent BLs?
+# TODO: handle newick without parents & without parent BLs?
 # e.g., ((1:0.1,2:0.2),(3:0.4,4:0.5));
 def _get_cherries_no_parents_with_bls(newick):
     ancestry = []
@@ -93,40 +92,34 @@ def _get_cherries_no_parents_with_bls(newick):
             bl2 = bl_stack.pop()
             bl1 = bl_stack.pop()
 
-            if c1 < c2:
-                c_min = c1
-                c_max = c2
-            else:
-                c_min = c2
-                c_max = c1
-
             c_min, c_max = sorted([c1, c2])
 
             # No parent annotation --> store the max leaf
             ancestry.append([c1, c2, c_max])
             bls.append([bl1, bl2])
 
-            # Push the min leaf to the stack
+            # Find the parental BL
+            # Ex: ":0.2"
             annotated_node, end = _node_substr(newick, i)
-            stack.append(c_min)
-            try:
-                bl_stack.append(float(annotated_node[1:]))
-                i = end - 1
-            except ValueError:
+            i = end - 1
+
+            if len(annotated_node) == 0 and end == len(newick) - 1:
+                # if this is true, we reached the root which we don't have a parent BL
+                # We could break, but "continue" might prevent silent errors
                 break
+
+            # Push the min leaf to the stack
+            stack.append(c_min)
+            # Push the parent BL to the BL stack
+            bl_stack.append(float(annotated_node[1:]))
 
         elif "0" <= char <= "9":
             annotated_node, end = _node_substr(newick, i)
 
-            try:
-                # print(annotated_node)
-                node, bln = annotated_node.split(":", 1)
+            node, bln = annotated_node.split(":", 1)
 
-                stack.append(int(node))
-                bl_stack.append(float(bln))
-            except ValueError:
-                stack.append(min(stack[-2:]))
-                bl_stack.append(float(annotated_node))
+            stack.append(int(node))
+            bl_stack.append(float(bln))
 
             i = end - 1
 
