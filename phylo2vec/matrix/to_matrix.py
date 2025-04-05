@@ -1,3 +1,11 @@
+"""
+Methods to convert a Newick to a Phylo2Mat matrix.
+
+Two main methods:
+    - to_matrix for a Newick with parent labels + branch lengths
+    - to_matrix_no_parents for a Newick without parent labels + branch lengths
+"""
+
 import numpy as np
 
 from phylo2vec.base.to_vector import (
@@ -140,7 +148,7 @@ def to_matrix(newick):
     ----------
     newick : str
         Newick string for a tree
-        # e.g., ((1:0.1,2:0.2):0.6,(3:0.4,4:0.5):0.7);
+        # e.g., ((0:0.1,1:0.2)4:0.6,(2:0.4,3:0.5)5:0.7);
 
     Returns
     -------
@@ -173,6 +181,7 @@ def to_matrix_no_parents(newick_no_parents):
     ----------
     newick : str
         Newick string for a tree
+        # e.g., ((0:0.1,1:0.2):0.6,(3:0.4,4:0.5):0.7);
 
     Returns
     -------
