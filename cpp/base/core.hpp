@@ -13,6 +13,8 @@
 
 typedef std::array<unsigned int, 2> Pair;
 
+typedef std::vector<Pair> Pairs;
+
 /**
  * @brief Phylo2Vec vector v
  * Let n the number of leaves:
@@ -41,4 +43,4 @@ struct Converter {
     std::string intNewick;
 };
 
-#endif // CORE_HPP
+#endif  // CORE_HPP

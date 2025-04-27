@@ -6,10 +6,12 @@
  * @brief Vector-to-Newick conversion functions
  */
 
-#include "avl.hpp"
+#include "../utils/avl.hpp"
 #include "core.hpp"
 
-std::vector<Pair> getPairs(const PhyloVec &v);
+AVLTree makeTree(const PhyloVec &v);
+
+Pairs getPairs(const PhyloVec &v);
 
 /**
  * @brief Get ancestry for each node given a v-representation.
@@ -42,4 +44,4 @@ std::string buildNewick(const Ancestry &ancestry);
  */
 std::string toNewick(const PhyloVec &v);
 
-#endif // TO_NEWICK_HPP
+#endif  // TO_NEWICK_HPP

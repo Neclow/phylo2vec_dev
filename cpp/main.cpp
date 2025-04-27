@@ -1,10 +1,10 @@
+#include <iostream>
+
 #include "base/core.hpp"
 #include "base/to_newick.hpp"
 #include "base/to_vector.hpp"
-#include "utils/newick.hpp"
-#include "utils/random.hpp"
-
-#include <iostream>
+#include "ops/newick.hpp"
+#include "ops/vector.hpp"
 
 int main() {
     PhyloVec v = sample(2048, false);

@@ -1,9 +1,10 @@
 #include "pairwise.hpp"
-#include "../base/to_newick.hpp"
-#include "../utils/validation.hpp"
 
 #include <sstream>
 #include <stdexcept>
+
+#include "../base/to_newick.hpp"
+#include "../ops/vector.hpp"
 
 Matrix copheneticDistances(const PhyloVec &v, bool unrooted) {
     const size_t numLeaves = v.size() + 1;
@@ -64,15 +65,13 @@ Matrix copheneticDistances(const PhyloVec &v, bool unrooted) {
     Matrix leafD(numLeaves, std::vector<float>(numLeaves, 0));
 
     for (size_t i = 0; i < numLeaves; ++i) {
-        leafD[i] =
-            std::vector<float>(fullD[i].begin(), fullD[i].begin() + numLeaves);
+        leafD[i] = std::vector<float>(fullD[i].begin(), fullD[i].begin() + numLeaves);
     }
 
     return leafD;
 }
 
-Matrix pairwiseDistances(const PhyloVec &v, std::string_view metric,
-                         bool unrooted) {
+Matrix pairwiseDistances(const PhyloVec &v, std::string_view metric, bool unrooted) {
     if (metric == "cophenetic") {
         return copheneticDistances(v, unrooted);
     } else {

@@ -1,6 +1,6 @@
 #include "to_newick.hpp"
 
-std::vector<Pair> getPairs(const PhyloVec &v) {
+AVLTree makeTree(const PhyloVec &v) {
     const size_t k = v.size();
 
     AVLTree avl_tree;
@@ -33,19 +33,25 @@ std::vector<Pair> getPairs(const PhyloVec &v) {
             beforehand which is deeper than the branch v[i]
             */
             unsigned int index = v[i] - nextLeaf;
-            Pair value = avl_tree.lookup(avl_tree.root, index);
+            Pair value = avl_tree.lookup(avl_tree.getRoot(), index);
 
             avl_tree.insert(index + 1, {value[0], nextLeaf});
         }
     }
 
-    return avl_tree.getPairs();
+    return avl_tree;
 }
 
-Ancestry getAncestry(const PhyloVec &v) {
+Pairs getPairs(const PhyloVec &v) {
+    AVLTree tree = makeTree(v);
+    return tree.getPairs();
+}
+
+[[deprecated("getAncestry is no longer used in toNewick, and is left for legacy reasons")]] Ancestry
+getAncestry(const PhyloVec &v) {
     const size_t k = v.size();
 
-    std::vector<Pair> pairs = getPairs(v);
+    Pairs pairs = getPairs(v);
 
     // Matrix with 3 columns: child1, child2, parent
     Ancestry ancestry(k);
@@ -71,28 +77,27 @@ Ancestry getAncestry(const PhyloVec &v) {
     return ancestry;
 }
 
-static std::string buildNewickRecursiveInner(int p, const Ancestry &ancestry) {
-    const int leafMax = ancestry.size();
+std::string buildNewick(const Pairs &pairs) {
+    const unsigned int numLeaves = pairs.size() + 1;
 
-    auto &[c1, c2, _] = ancestry[p - leafMax - 1];
+    std::vector<std::string> cache;
+    cache.reserve(numLeaves);
+    for (size_t i = 0; i < numLeaves; ++i) {
+        cache.push_back(std::to_string(i));
+    }
 
-    std::string left = c1 > leafMax ? buildNewickRecursiveInner(c1, ancestry)
-                                    : std::to_string(c1);
-    std::string right = c2 > leafMax ? buildNewickRecursiveInner(c2, ancestry)
-                                     : std::to_string(c2);
+    for (size_t i = 0; i < pairs.size(); ++i) {
+        auto &[c1, c2] = pairs[i];
 
-    std::string newick = "(" + left + "," + right + ")" + std::to_string(p);
+        std::string next_parent = std::to_string(numLeaves + i);
 
-    return newick;
-}
+        cache[c1] = "(" + std::move(cache[c1]) + "," + std::move(cache[c2]) + ")" + next_parent;
+    }
 
-std::string buildNewick(const Ancestry &ancestry) {
-    const int root = ancestry.back()[2];
-
-    return buildNewickRecursiveInner(root, ancestry) + ";";
+    return cache[0] + ";";
 }
 
 std::string toNewick(const PhyloVec &v) {
-    Ancestry anc = getAncestry(v);
-    return buildNewick(anc);
+    Pairs pairs = getPairs(v);
+    return buildNewick(pairs);
 }

@@ -2,8 +2,7 @@
 
 #include "../base/to_newick.hpp"
 #include "../base/to_vector.hpp"
-#include "../utils/random.hpp"
-#include "../utils/validation.hpp"
+#include "../ops/vector.hpp"
 
 using namespace Rcpp;
 
@@ -29,6 +28,4 @@ PhyloVec to_vector_no_parents(const std::string &newick) {
 PhyloVec check_p2v(const PhyloVec &v) { check_v(v); }
 
 // [[Rcpp::export]]
-void sample_p2v(const size_t &numLeaves, bool ordered) {
-    sample(numLeaves, ordered);
-}
+void sample_p2v(const size_t &numLeaves, bool ordered) { sample(numLeaves, ordered); }

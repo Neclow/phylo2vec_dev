@@ -1,18 +1,15 @@
-#include "../utils/random.hpp"
-#include "../utils/validation.hpp"
-#include "../utils/vector.hpp"
-#include "config.cpp"
-
 #include <gtest/gtest.h>
 
 #include <random>
 
+#include "../ops/vector.hpp"
+#include "config.cpp"
+
 class UtilsTest : public ::testing::TestWithParam<int> {
-  protected:
+   protected:
 };
 
-INSTANTIATE_TEST_SUITE_P(RandomTests, UtilsTest,
-                         ::testing::Range(MIN_N_LEAVES, MAX_N_LEAVES));
+INSTANTIATE_TEST_SUITE_P(RandomTests, UtilsTest, ::testing::Range(MIN_N_LEAVES, MAX_N_LEAVES));
 
 TEST_P(UtilsTest, SampleTest) {
     int numLeaves = GetParam();
@@ -45,6 +42,6 @@ TEST_P(UtilsTest, RemoveAndAddTest) {
 
         addLeaf(v, leaf, sister);
 
-        ASSERT_TRUE(std::equal(v.begin(), v.end(), vOld.begin()));
+        EXPECT_EQ(v, vOld);
     }
 }

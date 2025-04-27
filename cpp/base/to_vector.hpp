@@ -1,5 +1,5 @@
 #ifndef TO_VECTOR_HPP
-#define TO_VECTORCORE_HPP
+#define TO_VECTOR_HPP
 
 /**
  * @file to_vector.hpp
@@ -107,7 +107,6 @@ void orderCherries(Ancestry &ancestry);
  * output[2] = 0 2 2
  * Iteration 4:
  * The last row is 0 1 1
- * child_min[8] = 0
  * ===== end =====
  * ```orderCherriesNoParents(cherries);```
  * output =
@@ -145,4 +144,4 @@ PhyloVec toVector(std::string_view newick);
  */
 PhyloVec toVectorNoParents(std::string_view newick_no_parents);
 
-#endif // TO_VECTOR_HPP
+#endif  // TO_VECTOR_HPP

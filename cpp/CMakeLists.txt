@@ -9,6 +9,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
@@ -24,14 +28,13 @@ include(FetchContent)
 
 # Source files
 set(SOURCES
-    base/avl.cpp
     base/to_newick.cpp
     base/to_vector.cpp
     matrix/to_newick.cpp
-    utils/random.cpp
-    utils/validation.cpp
-    utils/newick.cpp
-    utils/vector.cpp
+    ops/newick.cpp
+    ops/vector.cpp
+    utils/avl.cpp
+    utils/fenwick.cpp
 )
 
 set(BENCH_SOURCES

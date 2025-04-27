@@ -1,17 +1,16 @@
-#include "../base/to_newick.hpp"
-#include "../base/to_vector.hpp"
-#include "../utils/newick.hpp"
-#include "../utils/random.hpp"
-#include "config.cpp"
-
 #include <gtest/gtest.h>
 
+#include "../base/to_newick.hpp"
+#include "../base/to_vector.hpp"
+#include "../ops/newick.hpp"
+#include "../ops/vector.hpp"
+#include "config.cpp"
+
 class V2Newick2VTest : public ::testing::TestWithParam<int> {
-  protected:
+   protected:
 };
 
-INSTANTIATE_TEST_SUITE_P(RandomTests, V2Newick2VTest,
-                         ::testing::Range(MIN_N_LEAVES, MAX_N_LEAVES));
+INSTANTIATE_TEST_SUITE_P(RandomTests, V2Newick2VTest, ::testing::Range(MIN_N_LEAVES, MAX_N_LEAVES));
 
 TEST_P(V2Newick2VTest, V2Newick2V) {
     int numLeaves = GetParam();
@@ -21,7 +20,7 @@ TEST_P(V2Newick2VTest, V2Newick2V) {
 
         PhyloVec v2 = toVector(newick);
 
-        ASSERT_TRUE(std::equal(v.begin(), v.end(), v2.begin()));
+        EXPECT_EQ(v, v2);
     }
 }
 
@@ -40,5 +39,5 @@ TEST_P(V2Newick2VTest, Cherries) {
 
     orderCherriesNoParents(ancNoParents);
 
-    ASSERT_TRUE(std::equal(anc.begin(), anc.end(), ancNoParents.begin()));
+    EXPECT_EQ(anc, ancNoParents);
 }

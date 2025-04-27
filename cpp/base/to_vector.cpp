@@ -4,11 +4,13 @@
 #include <charconv>
 #include <numeric>
 #include <stdexcept>
+#include <unordered_map>
+
+#include "../utils/fenwick.hpp"
 
 int stoi_substr(std::string_view s, size_t start, size_t *end) {
     int value;
-    auto [ptr, ec] =
-        std::from_chars(s.data() + start, s.data() + s.size(), value);
+    auto [ptr, ec] = std::from_chars(s.data() + start, s.data() + s.size(), value);
     if (ec == std::errc()) {
         *end = ptr - s.data();
         return value;
@@ -18,7 +20,7 @@ int stoi_substr(std::string_view s, size_t start, size_t *end) {
 }
 
 Ancestry getCherries(std::string_view newick) {
-    Ancestry ancestry;
+    Ancestry cherries;
 
     // Stack of nodes
     std::vector<int> stack;
@@ -41,7 +43,7 @@ Ancestry getCherries(std::string_view newick) {
             i = end - 1;
 
             // Add the triplet (c1, c2, p)
-            ancestry.push_back({c1, c2, p});
+            cherries.push_back({c1, c2, p});
 
             // Push the parent node to the stack
             // c1 = p;
@@ -55,7 +57,7 @@ Ancestry getCherries(std::string_view newick) {
         }
     }
 
-    return ancestry;
+    return cherries;
 }
 
 Ancestry getCherriesNoParents(std::string_view newick) {
@@ -100,7 +102,7 @@ void orderCherries(Ancestry &ancestry) {
     const size_t numCherries = ancestry.size();
     const size_t numNodes = 2 * numCherries + 1;
 
-    // To keep track + update of the smallest Descendant of each triplet
+    // To keep track + update of the smallest descendant of each triplet
     // This allows us to reconstruct the triplets as they should appear
     // using the Phylo2Vec construction
     // Note: the first numLeaves indices are not used
@@ -109,10 +111,8 @@ void orderCherries(Ancestry &ancestry) {
     // Sort the ancestry by their parent node (ascending order)
     std::qsort(ancestry.data(), numCherries, sizeof(std::array<int, 3>),
                [](const void *a, const void *b) {
-                   const auto &arr1 =
-                       *static_cast<const std::array<int, 3> *>(a);
-                   const auto &arr2 =
-                       *static_cast<const std::array<int, 3> *>(b);
+                   const auto &arr1 = *static_cast<const std::array<int, 3> *>(a);
+                   const auto &arr2 = *static_cast<const std::array<int, 3> *>(b);
                    return arr1[2] - arr2[2];
                });
 
@@ -134,45 +134,39 @@ void orderCherries(Ancestry &ancestry) {
     }
 }
 
-void orderCherriesNoParents(Ancestry &ancestry) {
-    // numCherries = numLeaves - 1
-    const int numCherries = ancestry.size();
+void orderCherriesNoParents(Ancestry &cherries) {
+    std::vector<int> leaves;
+    std::unordered_map<int, int> visited;
 
-    for (int i = 0; i < numCherries; ++i) {
-        // Find the next index to process:
-        // The goal is to find the row with the highest leaf
-        // where both leaves were previously un-visited
-        // why? If a leaf in a cherry already appeared in the ancestry,
-        // it means that leaf was already involved in a shallower cherry
-        int idx;
+    for (size_t i = 0; i < cherries.size(); ++i) {
+        auto &[c1, c2, cMax] = cherries[i];
+        int cMin = std::min(c1, c2);
 
-        // Initially, all cherries have not been processed
-        std::vector<std::uint8_t> unvisited(numCherries + 1, 1);
+        int toProcess = cMax;
 
-        // Temporary max leaf
-        int maxLeaf = 0;
-
-        for (int j = i; j < numCherries; ++j) {
-            auto &[c1, c2, cMax] = ancestry[j];
-
-            if (cMax > maxLeaf) {
-                if (unvisited[c1] && unvisited[c2]) {
-                    maxLeaf = cMax;
-                    idx = j;
-                }
-            }
-
-            // c1 and c2 have been processed
-            unvisited[c1] = 0;
-            unvisited[c2] = 0;
+        if (visited.find(cMin) != visited.end() && visited[cMin] < cMax) {
+            toProcess = visited[cMin];
         }
 
-        // Move row idx to row i
-        if (idx != i) {
-            std::rotate(ancestry.begin() + i, ancestry.begin() + idx,
-                        ancestry.begin() + idx + 1);
-        }
+        leaves.push_back(toProcess);
+        visited[cMin] = toProcess;
     }
+
+    // argsort with descending order
+    // argsort used here for to_matrix to reorder BLs
+    std::vector<size_t> indices(cherries.size());
+    std::iota(indices.begin(), indices.end(), 0);
+    // stable sort is important to keep the order of cherries
+    std::stable_sort(indices.begin(), indices.end(),
+                     [&leaves](size_t i, size_t j) { return leaves[i] > leaves[j]; });
+
+    // Reorder the cherries in place using the sorted indices
+    Ancestry temp;
+    temp.reserve(cherries.size());
+    for (size_t i : indices) {
+        temp.push_back(cherries[i]);
+    }
+    cherries = std::move(temp);
 }
 
 PhyloVec buildVector(Ancestry cherries) {
@@ -181,23 +175,19 @@ PhyloVec buildVector(Ancestry cherries) {
 
     PhyloVec v(numCherries, 0);
 
-    std::vector<uint8_t> idxs(numLeaves, 0);
+    FenwickTree bit(numLeaves);
 
     // Note: v[0] is always 0
     // but starting with i = 1 makes some tests fail (weird)
     for (size_t i = 0; i < numCherries; ++i) {
         auto &[c1, c2, cMax] = cherries[i];
 
-        int idx = 0;
-
-        for (int j = 1; j < cMax; ++j) {
-            idx += idxs[j];
-        }
+        unsigned int idx = bit.prefix_sum(cMax - 1);
 
         // Reminder: v[i] = j --> branch i yields leaf j
         v[cMax - 1] = idx == 0 ? std::min(c1, c2) : cMax - 1 + idx;
 
-        idxs[cMax] = 1;
+        bit.update(cMax, 1);
     }
 
     return v;
@@ -214,8 +204,7 @@ PhyloVec toVector(std::string_view newick) {
 }
 
 PhyloVec toVectorNoParents(std::string_view newick) {
-    Ancestry ancestry =
-        getCherriesNoParents(newick.substr(0, newick.length() - 1));
+    Ancestry ancestry = getCherriesNoParents(newick.substr(0, newick.length() - 1));
 
     orderCherriesNoParents(ancestry);
 

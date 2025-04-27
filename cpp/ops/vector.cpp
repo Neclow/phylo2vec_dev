@@ -1,10 +1,45 @@
 #include "vector.hpp"
 
+#include <random>
+#include <sstream>
+#include <stdexcept>
+
 #include "../base/to_newick.hpp"
 #include "../base/to_vector.hpp"
 
-std::pair<size_t, size_t> findCoordsOfFirstLeaf(const Ancestry &ancestry,
-                                                int leaf) {
+PhyloVec sample(const size_t &numLeaves, bool ordered) {
+    PhyloVec v(numLeaves - 1);
+    // static std::mt19937 gen(std::random_device{}());
+    static std::minstd_rand gen(std::random_device{}());
+
+    if (ordered) {
+        for (size_t i = 1; i < numLeaves - 1; ++i) {
+            v[i] = gen() % (i + 1);
+        }
+    } else {
+        for (size_t i = 1; i < numLeaves - 1; ++i) {
+            v[i] = gen() % (2 * i + 1);
+        }
+    }
+
+    return v;
+}
+
+void check_v(const PhyloVec &v) {
+    // check that v is valid: 0 <= v[i] <= 2i
+
+    const size_t k = v.size();
+    for (size_t i = 0; i < k; ++i) {
+        if (v[i] > 2 * i) {
+            std::ostringstream oss;
+            oss << "Invalid value at index " << i << ": v[i] should be less than 2i, found " << v[i]
+                << ".";
+            throw std::out_of_range(oss.str());
+        }
+    }
+}
+
+std::pair<size_t, size_t> findCoordsOfFirstLeaf(const Ancestry &ancestry, int leaf) {
     std::pair<size_t, size_t> coords;
     for (size_t r = 0; r < ancestry.size(); ++r) {
         for (size_t c = 0; c < 3; ++c) {
@@ -25,8 +60,7 @@ void addLeaf(PhyloVec &v, unsigned int leaf, unsigned int pos) {
     Ancestry ancestryAdd = getAncestry(v);
 
     // Block l. 23 to l. 44 should be simplifiable
-    std::pair<size_t, size_t> leafCoords =
-        findCoordsOfFirstLeaf(ancestryAdd, v.size());
+    std::pair<size_t, size_t> leafCoords = findCoordsOfFirstLeaf(ancestryAdd, v.size());
 
     size_t leafRow = leafCoords.first;
     size_t leafCol = leafCoords.second;
@@ -59,8 +93,7 @@ void addLeaf(PhyloVec &v, unsigned int leaf, unsigned int pos) {
 unsigned int removeLeaf(PhyloVec &v, unsigned int leaf) {
     Ancestry ancestry = getAncestry(v);
 
-    std::pair<size_t, size_t> leafCoords =
-        findCoordsOfFirstLeaf(ancestry, leaf);
+    std::pair<size_t, size_t> leafCoords = findCoordsOfFirstLeaf(ancestry, leaf);
 
     size_t leafRow = leafCoords.first;
     size_t leafCol = leafCoords.second;
@@ -139,8 +172,7 @@ std::vector<std::vector<unsigned int>> getAncestryPaths(const PhyloVec &v) {
 
     return ancestryPaths;
 }
-int getCommonAncestor(const PhyloVec &v, unsigned int node1,
-                      unsigned int node2) {
+int getCommonAncestor(const PhyloVec &v, unsigned int node1, unsigned int node2) {
     std::vector<std::vector<unsigned int>> ancestry_paths = getAncestryPaths(v);
 
     std::vector<unsigned int> path1 = ancestry_paths[node1];
@@ -149,13 +181,13 @@ int getCommonAncestor(const PhyloVec &v, unsigned int node1,
     unsigned int i = 0, j = 0;
     while (i < path1.size() && j < path2.size()) {
         if (path1[i] == path2[j]) {
-            return path1[i]; // Found MRCA
+            return path1[i];  // Found MRCA
         } else if (path1[i] < path2[j]) {
-            i++; // Move pointer in vec1 forward
+            i++;  // Move pointer in vec1 forward
         } else {
-            j++; // Move pointer in vec2 forward
+            j++;  // Move pointer in vec2 forward
         }
     }
 
-    return 2 * v.size(); // No common element found --> return root
+    return 2 * v.size();  // No common element found --> return root
 }
