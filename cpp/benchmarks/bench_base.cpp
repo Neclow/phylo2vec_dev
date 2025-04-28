@@ -49,8 +49,7 @@ static void BM_toVectorNoParents(benchmark::State &state) {
     for (auto _ : state) {
         state.PauseTiming();
         PhyloVec v1 = sample(n, false);
-        std::string newick = toNewick(v1);
-        removeParentLabels(newick);
+        std::string newick = toNewick(v1, false);
         state.ResumeTiming();
         PhyloVec v2 = toVectorNoParents(newick);
         benchmark::DoNotOptimize(v2);
@@ -59,12 +58,12 @@ static void BM_toVectorNoParents(benchmark::State &state) {
 }
 
 #define QUICK_RANGE Range(8 << 6, 8 << 12)->Unit(benchmark::kMillisecond)
-#define BIG_RANGE RangeMultiplier(2)->DenseRange(1000, 100000, 1000)->Unit(benchmark::kMillisecond)
+#define BIG_RANGE DenseRange(10000, 100000, 10000)->Unit(benchmark::kMillisecond)
 
-BENCHMARK(BM_sample)->QUICK_RANGE;
-BENCHMARK(BM_toNewick)->QUICK_RANGE;
-BENCHMARK(BM_toVector)->QUICK_RANGE;
-BENCHMARK(BM_toVectorNoParents)->QUICK_RANGE;
+BENCHMARK(BM_sample)->BIG_RANGE;
+BENCHMARK(BM_toNewick)->BIG_RANGE;
+BENCHMARK(BM_toVector)->BIG_RANGE;
+BENCHMARK(BM_toVectorNoParents)->BIG_RANGE;
 
 // Run the benchmark
 BENCHMARK_MAIN();

@@ -33,15 +33,14 @@ Ancestry getAncestry(const PhyloVec &v);
  * @param ancestry "Ancestry" array of size (n_leaves - 1, 3)
  * @return std::string Newick string
  */
-std::string buildNewick(const Ancestry &ancestry);
+std::string buildNewick(const Ancestry &ancestry, bool withInternals = true);
 
 /**
  * @brief Convert a Phylo2Vec vector to a Newick string.
  * Wraps getAncestry and buildNewick
- *
- *
  * @param v Phylo2Vec vector
+ * @return std::string Newick string
  */
-std::string toNewick(const PhyloVec &v);
+std::string toNewick(const PhyloVec &v, bool withInternals = true);
 
 #endif  // TO_NEWICK_HPP

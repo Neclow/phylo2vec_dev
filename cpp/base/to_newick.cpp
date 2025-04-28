@@ -77,7 +77,7 @@ getAncestry(const PhyloVec &v) {
     return ancestry;
 }
 
-std::string buildNewick(const Pairs &pairs) {
+std::string buildNewick(const Pairs &pairs, bool withInternals) {
     const unsigned int numLeaves = pairs.size() + 1;
 
     std::vector<std::string> cache;
@@ -89,15 +89,18 @@ std::string buildNewick(const Pairs &pairs) {
     for (size_t i = 0; i < pairs.size(); ++i) {
         auto &[c1, c2] = pairs[i];
 
-        std::string next_parent = std::to_string(numLeaves + i);
+        cache[c1] = "(" + std::move(cache[c1]) + "," + std::move(cache[c2]) + ")";
 
-        cache[c1] = "(" + std::move(cache[c1]) + "," + std::move(cache[c2]) + ")" + next_parent;
+        if (withInternals) {
+            std::string next_parent = std::to_string(numLeaves + i);
+            cache[c1] += next_parent;
+        }
     }
 
     return cache[0] + ";";
 }
 
-std::string toNewick(const PhyloVec &v) {
+std::string toNewick(const PhyloVec &v, bool withInternals) {
     Pairs pairs = getPairs(v);
-    return buildNewick(pairs);
+    return buildNewick(pairs, withInternals);
 }
